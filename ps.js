@@ -147,6 +147,25 @@ class PegSolitaireState {
         // console.log(this.holes);
     }
 
+    isValidMoveSequence(moves) {
+        if(!Array.isArray(moves) || moves.length <= 0) {
+            return false;
+        } else if(moves.length <= 1) {
+            return this.isValidMove(moves[0]);
+        } else {
+            let saveState = this.save();
+            for (let i=0; i<moves.length; i++) {
+                if(!this.isValidMove(moves[i])) {
+                    this.restore(saveState);
+                    return false;
+                }
+                this.performMove(moves[i]);
+            }
+            this.restore(saveState);
+            return true;
+        }     
+    }
+
     isValidMove(move) {
         //check if move contains hole and direction
         if(!move.hole || !move.direction) {
@@ -252,22 +271,7 @@ class EnglishPegSolitaire extends PegSolitaireState{
 
     isValidMove(moveStr) {
         let moves = EnglishPegSolitaire.getMovesFromString(moveStr);
-        if(moves.length <= 0) {
-            return false;
-        } else if(moves.length <= 1) {
-            return super.isValidMove(moves[0]);
-        } else {
-            let saveState = this.save();
-            for (let i=0; i<moves.length; i++) {
-                if(!super.isValidMove(moves[i])) {
-                    this.restore(saveState);
-                    return false;
-                }
-                super.performMove(moves[i]);
-            }
-            this.restore(saveState);
-        }
-        return true;
+        return this.isValidMoveSequence(moves);
     }
 
     static getPositionFromArray(pos) {
