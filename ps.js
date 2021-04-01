@@ -246,22 +246,11 @@ class PegSolitaireState {
     }
 };
 
-PegSolitaireState.ENGLISH_INTIAL_STATE = "2...2/2...2/......./...o.../......./2...2/2...2";
-PegSolitaireState.ENGLISH_POSITION_KEY = [
-    [" ", " ", "a", "b", "c", " ", " "],
-    [" ", " ", "d", "e", "f", " ", " "],
-    ["g", "h", "i", "j", "k", "l", "m"],
-    ["n", "o", "p", "x", "P", "O", "N"],
-    ["M", "L", "K", "J", "I", "H", "G"],
-    [" ", " ", "F", "E", "D", " ", " "],
-    [" ", " ", "C", "B", "A", " ", " "],
-];
-
 PegSolitaireState.INITIAL_EUROPEAN_STATE = "2...2/1.....1/......./...o.../....../1.....1/2...2";
 
 class EnglishPegSolitaire extends PegSolitaireState{
-    constructor() {
-        super(PegSolitaireState.ENGLISH_INTIAL_STATE);
+    constructor(initStr = EnglishPegSolitaire.INTIAL_STATE) {
+        super(initStr);
     }
 
     performMove(moveStr) {
@@ -269,7 +258,7 @@ class EnglishPegSolitaire extends PegSolitaireState{
         moves.forEach(move =>  super.performMove(move));
     }
 
-    isValidMove(moveStr) {
+    isValidMoveString(moveStr) {
         let moves = EnglishPegSolitaire.getMovesFromString(moveStr);
         return this.isValidMoveSequence(moves);
     }
@@ -287,7 +276,7 @@ class EnglishPegSolitaire extends PegSolitaireState{
             //test if string of the form "ar" where a = hole position, r = direction of move
             let pos = moveStr[0];
             let direction = moveStr[1];
-            let hole = PegSolitaireState.ENGLISH_HP_TO_IP_MAP.get(pos);
+            let hole = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(pos);
             return [{hole, direction}];
 
         } else if(/^([a-pA-Px]-)+[a-pA-Px]$/.test(moveStr)) {
@@ -296,8 +285,8 @@ class EnglishPegSolitaire extends PegSolitaireState{
             let positions = moveStr.split("-");
             let src = positions.shift();
             while(positions.length > 0) {
-                let peg = PegSolitaireState.ENGLISH_HP_TO_IP_MAP.get(src);
-                let hole = PegSolitaireState.ENGLISH_HP_TO_IP_MAP.get(positions[0]);
+                let peg = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(src);
+                let hole = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(positions[0]);
                 let direction = PegSolitaireState.getDirection(peg, hole);
                 let move = {hole, direction};
 
@@ -311,13 +300,24 @@ class EnglishPegSolitaire extends PegSolitaireState{
     }
 
     print() {
-        console.log(this.board.map((row, i) => row.join(" ") + "  |  " + PegSolitaireState.ENGLISH_POSITION_KEY[i].join(" ")).join("\n"))
+        console.log(this.board.map((row, i) => row.join(" ") + "  |  " + EnglishPegSolitaire.POSITION_KEY[i].join(" ")).join("\n"))
     }
 
     isSolved() {
         return this.holes.size == 32 && !this.holes.has("3,3");
     }
 };
+
+EnglishPegSolitaire.INTIAL_STATE = "2...2/2...2/......./...o.../......./2...2/2...2";
+EnglishPegSolitaire.POSITION_KEY = [
+    [" ", " ", "a", "b", "c", " ", " "],
+    [" ", " ", "d", "e", "f", " ", " "],
+    ["g", "h", "i", "j", "k", "l", "m"],
+    ["n", "o", "p", "x", "P", "O", "N"],
+    ["M", "L", "K", "J", "I", "H", "G"],
+    [" ", " ", "F", "E", "D", " ", " "],
+    [" ", " ", "C", "B", "A", " ", " "],
+];
 
 EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP = new Map([
     ["a",[0,2]], ["b",[0,3]], ["c",[0,4]], ["d",[1,2]], ["e",[1,3]], ["f",[1,4]], ["g",[2,0]], ["h",[2,1]], ["i",[2,2]], ["j",[2,3]], ["k",[2,4]], 
