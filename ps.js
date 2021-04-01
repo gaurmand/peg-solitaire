@@ -237,11 +237,6 @@ PegSolitaireState.ENGLISH_POSITION_KEY = [
     [" ", " ", "F", "E", "D", " ", " "],
     [" ", " ", "C", "B", "A", " ", " "],
 ];
-PegSolitaireState.ENGLISH_HP_TO_IP_MAP = new Map([
-    ["a",[0,2]], ["b",[0,3]], ["c",[0,4]], ["d",[1,2]], ["e",[1,3]], ["f",[1,4]], ["g",[2,0]], ["h",[2,1]], ["i",[2,2]], ["j",[2,3]], ["k",[2,4]], 
-    ["l",[2,5]], ["m",[2,6]], ["n",[3,0]], ["o",[3,1]], ["p",[3,2]], ["x",[3,3]], ["P",[3,4]], ["O",[3,5]], ["N",[3,6]], ["M",[4,0]], ["L",[4,1]], 
-    ["K",[4,2]], ["J",[4,3]], ["I",[4,4]], ["H",[4,5]], ["G",[4,6]], ["F",[5,2]], ["E",[5,3]], ["D",[5,4]], ["C",[6,2]], ["B",[6,3]], ["A",[6,4]]
-]); 
 
 PegSolitaireState.INITIAL_EUROPEAN_STATE = "2...2/1.....1/......./...o.../....../1.....1/2...2";
 
@@ -251,12 +246,12 @@ class EnglishPegSolitaire extends PegSolitaireState{
     }
 
     performMove(moveStr) {
-        let moves = EnglishPegSolitaire.translateMoves(moveStr);
+        let moves = EnglishPegSolitaire.getMovesFromString(moveStr);
         moves.forEach(move =>  super.performMove(move));
     }
 
     isValidMove(moveStr) {
-        let moves = EnglishPegSolitaire.translateMoves(moveStr);
+        let moves = EnglishPegSolitaire.getMovesFromString(moveStr);
         if(moves.length <= 0) {
             return false;
         } else if(moves.length <= 1) {
@@ -275,7 +270,15 @@ class EnglishPegSolitaire extends PegSolitaireState{
         return true;
     }
 
-    static translateMoves(moveStr) {
+    static getPositionFromArray(pos) {
+        if(!pos || pos.length !== 2) {
+            return "";
+        }
+        let key = pos[0].toString() + pos[1].toString();
+        return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(key);
+    }
+
+    static getMovesFromString(moveStr) {
         if(/[a-pA-Px][udrl]/.test(moveStr)) {
             //test if string of the form "ar" where a = hole position, r = direction of move
             let pos = moveStr[0];
@@ -311,6 +314,18 @@ class EnglishPegSolitaire extends PegSolitaireState{
         return this.holes.size == 32 && !this.holes.has("3,3");
     }
 };
+
+EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP = new Map([
+    ["a",[0,2]], ["b",[0,3]], ["c",[0,4]], ["d",[1,2]], ["e",[1,3]], ["f",[1,4]], ["g",[2,0]], ["h",[2,1]], ["i",[2,2]], ["j",[2,3]], ["k",[2,4]], 
+    ["l",[2,5]], ["m",[2,6]], ["n",[3,0]], ["o",[3,1]], ["p",[3,2]], ["x",[3,3]], ["P",[3,4]], ["O",[3,5]], ["N",[3,6]], ["M",[4,0]], ["L",[4,1]], 
+    ["K",[4,2]], ["J",[4,3]], ["I",[4,4]], ["H",[4,5]], ["G",[4,6]], ["F",[5,2]], ["E",[5,3]], ["D",[5,4]], ["C",[6,2]], ["B",[6,3]], ["A",[6,4]]
+]);
+
+EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP = new Map([
+    ["02","a"], ["03","b"], ["04","c"], ["12","d"], ["13","e"], ["14","f"], ["20","g"], ["21","h"], ["22","i"], ["23","j"], ["24","k"], 
+    ["25","l"], ["26","m"], ["30","n"], ["31","o"], ["32","p"], ["33","x"], ["34","P"], ["35","O"], ["36","N"], ["40","M"], ["41","L"], 
+    ["42","K"], ["43","J"], ["44","I"], ["45","H"], ["46","G"], ["52","F"], ["53","E"], ["54","D"], ["62","C"], ["63","B"], ["64","A"]
+]); 
 
 module.exports = {
     EnglishPegSolitaire
