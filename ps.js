@@ -245,41 +245,37 @@ PegSolitaireState.ENGLISH_HP_TO_IP_MAP = new Map([
 
 PegSolitaireState.INITIAL_EUROPEAN_STATE = "2...2/1.....1/......./...o.../....../1.....1/2...2";
 
-class EnglishPegSolitaire {
+class EnglishPegSolitaire extends PegSolitaireState{
     constructor() {
-        this.state = new PegSolitaireState(PegSolitaireState.ENGLISH_INTIAL_STATE);
-    }
-
-    getMoves() {
-        return this.state.getMoves();
+        super(PegSolitaireState.ENGLISH_INTIAL_STATE);
     }
 
     performMove(moveStr) {
-        let moves = this.translateMoves(moveStr);
-        moves.forEach(move =>  this.state.performMove(move));
+        let moves = EnglishPegSolitaire.translateMoves(moveStr);
+        moves.forEach(move =>  super.performMove(move));
     }
 
     isValidMove(moveStr) {
-        let moves = this.translateMoves(moveStr);
+        let moves = EnglishPegSolitaire.translateMoves(moveStr);
         if(moves.length <= 0) {
             return false;
         } else if(moves.length <= 1) {
-            return this.state.isValidMove(moves[0]);
+            return super.isValidMove(moves[0]);
         } else {
-            let saveState = this.state.save();
+            let saveState = this.save();
             for (let i=0; i<moves.length; i++) {
-                if(!this.state.isValidMove(moves[i])) {
-                    this.state.restore(saveState);
+                if(!super.isValidMove(moves[i])) {
+                    this.restore(saveState);
                     return false;
                 }
-                this.state.performMove(moves[i]);
+                super.performMove(moves[i]);
             }
-            this.state.restore(saveState);
+            this.restore(saveState);
         }
         return true;
     }
 
-    translateMoves(moveStr) {
+    static translateMoves(moveStr) {
         if(/[a-pA-Px][udrl]/.test(moveStr)) {
             //test if string of the form "ar" where a = hole position, r = direction of move
             let pos = moveStr[0];
@@ -308,11 +304,11 @@ class EnglishPegSolitaire {
     }
 
     print() {
-        console.log(this.state.board.map((row, i) => row.join(" ") + "  |  " + PegSolitaireState.ENGLISH_POSITION_KEY[i].join(" ")).join("\n"))
+        console.log(this.board.map((row, i) => row.join(" ") + "  |  " + PegSolitaireState.ENGLISH_POSITION_KEY[i].join(" ")).join("\n"))
     }
 
     isSolved() {
-        return this.state.holes.size == 32 && !this.state.holes.has("3,3");
+        return this.holes.size == 32 && !this.holes.has("3,3");
     }
 };
 

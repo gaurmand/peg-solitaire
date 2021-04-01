@@ -16,11 +16,11 @@ promptMove();
 function promptMove() {
     rl.question('Enter your move (e.g. \"e-x\"): ', (moveStr) => {
         if(moveStr == "moves") {
-            console.log(game.state.getMoves());
+            console.log(game.getMoves());
         }else if(moveStr == "print") {
             game.print();
         }else if(moveStr == "holes") {
-            game.state.printHoles();
+            game.printHoles();
         }else if(moveStr == "q") {
             rl.close();
             return;
