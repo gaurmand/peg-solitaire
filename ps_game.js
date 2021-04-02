@@ -1,6 +1,6 @@
 const readline = require('readline');
 
-const {EnglishPegSolitaire} = require('./ps');
+const {EnglishPegSolitaire} = require('./englishpegsolitaire');
 
 
 const rl = readline.createInterface({
