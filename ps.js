@@ -184,11 +184,11 @@ class PegSolitaireState {
     }
 
     printHoles() {
-        console.log(this.holes)
+        console.log([...this.holes])
     }
 
     printMoves() {
-        console.log(this.moves)
+        console.log([...this.moves])
     }
 
     save() {
@@ -333,8 +333,24 @@ class EnglishPegSolitaire extends PegSolitaireState{
         console.log(this.board.map((row, i) => row.join(" ") + "  |  " + EnglishPegSolitaire.POSITION_KEY[i].join(" ")).join("\n"))
     }
 
+    printHoles() {
+        console.log([...this.holes].map(hole => EnglishPegSolitaire.getPositionStr(hole)));
+    }
+
+    printMoves() {
+        console.log([...this.moves].map(move => EnglishPegSolitaire.getMoveStr(move)));
+    }
+
     isSolved() {
         return this.holes.size == 32 && !this.holes.has("3,3");
+    }
+
+    static getPositionStr(pos) {
+        return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(PegSolitaireState.getHoleKey(pos));
+    }
+
+    static getMoveStr(move) {
+        return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(move.slice(0,2)) + "-" + EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(move.slice(2,4));
     }
 };
 
