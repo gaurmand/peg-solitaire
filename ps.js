@@ -50,50 +50,6 @@ class PegSolitaireState {
         this.moves = new Set(this.computeMoves().map(move => PegSolitaireState.getMoveKey(move)));
     }
 
-    static getMoveKey(move) {
-        return move.srcPeg[0].toString() + move.srcPeg[1].toString() + move.hole[0].toString() + move.hole[1].toString();
-    }
-
-    static getHoleKey(hole) {
-        return hole[0].toString() + hole[1].toString();
-    }
-
-    static isValidInitString(str) {
-        //check if string is valid size
-        if(!str || str.length === 0) {
-            return false;
-        }
-
-        //check if string contains only ".", "o", and "/" characters
-        if(!/^[\d.o/]+$/.test(str)) {
-            return false;
-        }
-
-        //check if string doesnt start or end with "/"
-        if(str[0] === "/" || str[str.length-1] === "/") {
-            return false;
-        }
-
-        //check if string creates a rectangular board array (Note: the board itself doesn't necessarily have to be rectangular)
-        let isDigit = char => /^\d+$/.test(char);
-        let rowLengths = str.split("/").map(rowStr => {
-            let length = 0;
-            [...rowStr].forEach(char => {
-                if(isDigit(char)) {
-                    length += parseInt(char);
-                } else {
-                    length++;
-                }
-            });
-            return length;
-        });
-        if(!rowLengths.every(length => length === rowLengths[0])) {
-            return false;
-        }
-
-        return true;
-    }
-
     getMoves() {
         return [...this.moves]
     }
@@ -136,11 +92,11 @@ class PegSolitaireState {
         //replace moved & jumped pegs with holes
         this.board[srcPeg[0]][srcPeg[1]] = "o";
         this.board[jumpedPeg[0]][jumpedPeg[1]] = "o";
-        this.holes.add(PegSolitaireState.getHoleKey(srcPeg));
-        this.holes.add(PegSolitaireState.getHoleKey(jumpedPeg));
+        this.holes.add(PegSolitaireState.getPositionKey(srcPeg));
+        this.holes.add(PegSolitaireState.getPositionKey(jumpedPeg));
 
         //replace hole that peg jumped into with the peg
-        this.holes.delete(PegSolitaireState.getHoleKey(hole));
+        this.holes.delete(PegSolitaireState.getPositionKey(hole));
         this.board[row][col] = ".";
 
         this.updateMoves();
@@ -204,6 +160,43 @@ class PegSolitaireState {
         this.updateMoves();
     }
 
+    
+    static isValidInitString(str) {
+        //check if string is valid size
+        if(!str || str.length === 0) {
+            return false;
+        }
+
+        //check if string contains only ".", "o", and "/" characters
+        if(!/^[\d.o/]+$/.test(str)) {
+            return false;
+        }
+
+        //check if string doesnt start or end with "/"
+        if(str[0] === "/" || str[str.length-1] === "/") {
+            return false;
+        }
+
+        //check if string creates a rectangular board array (Note: the board itself doesn't necessarily have to be rectangular)
+        let isDigit = char => /^\d+$/.test(char);
+        let rowLengths = str.split("/").map(rowStr => {
+            let length = 0;
+            [...rowStr].forEach(char => {
+                if(isDigit(char)) {
+                    length += parseInt(char);
+                } else {
+                    length++;
+                }
+            });
+            return length;
+        });
+        if(!rowLengths.every(length => length === rowLengths[0])) {
+            return false;
+        }
+
+        return true;
+    }
+
     static getJumpedPeg(move) {
         let srcPeg = move.srcPeg;
         let [row, col] = move.hole;
@@ -227,6 +220,14 @@ class PegSolitaireState {
         }
         return [];
     }
+
+    static getMoveKey(move) {
+        return move.srcPeg[0].toString() + move.srcPeg[1].toString() + move.hole[0].toString() + move.hole[1].toString();
+    }
+
+    static getPositionKey(hole) {
+        return hole[0].toString() + hole[1].toString();
+    }
 };
 
 PegSolitaireState.INITIAL_EUROPEAN_STATE = "2...2/1.....1/......./...o.../....../1.....1/2...2";
@@ -240,7 +241,7 @@ class EnglishPegSolitaire extends PegSolitaireState{
         if(checkIfValid && !this.isValidMove(moveStr)) {
             return false;
         }
-        let moves = EnglishPegSolitaire.getMovesFromString(moveStr);
+        let moves = EnglishPegSolitaire.getMoveSequenceFromString(moveStr);
         this.performMoveSequence(moves);
         return true;
     }
@@ -250,7 +251,7 @@ class EnglishPegSolitaire extends PegSolitaireState{
     }
 
     isValidMove(moveStr) {
-        let moves = EnglishPegSolitaire.getMovesFromString(moveStr);
+        let moves = EnglishPegSolitaire.getMoveSequenceFromString(moveStr);
         return this.isValidMoveSequence(moves); 
     }
 
@@ -273,20 +274,28 @@ class EnglishPegSolitaire extends PegSolitaireState{
         }     
     }
 
-    static getPositionFromArray(pos) {
-        if(!pos || pos.length !== 2) {
-            return "";
-        }
-        let key = pos[0].toString() + pos[1].toString();
-        return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(key);
+    print() {
+        console.log(this.board.map((row, i) => row.join(" ") + "  |  " + EnglishPegSolitaire.POSITION_KEY[i].join(" ")).join("\n"))
     }
 
-    static getMovesFromString(moveStr) {
+    printHoles() {
+        console.log([...this.holes].map(hole => EnglishPegSolitaire.getPositionStr(hole)));
+    }
+
+    printMoves() {
+        console.log([...this.moves].map(move => EnglishPegSolitaire.getMoveStr(move)));
+    }
+
+    isSolved() {
+        return this.holes.size == 32 && !this.holes.has("3,3");
+    }
+
+    static getMoveSequenceFromString(moveStr) {
         if(/[a-pA-Px][udrl]/.test(moveStr)) {
             //test if string of the form "ar" where a = hole position, r = direction of move
             let holePos = moveStr[0];
             let direction = moveStr[1];
-            let hole = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(holePos);
+            let hole = EnglishPegSolitaire.getPositionFromString(holePos);
             let [row, col] = hole;
 
             //determine position of source peg
@@ -316,8 +325,8 @@ class EnglishPegSolitaire extends PegSolitaireState{
             let positions = moveStr.split("-");
             let src = positions.shift();
             while(positions.length > 0) {
-                let srcPeg = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(src);
-                let hole = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(positions[0]);
+                let srcPeg = EnglishPegSolitaire.getPositionFromString(src);
+                let hole = EnglishPegSolitaire.getPositionFromString(positions[0]);
                 let move = {srcPeg, hole};
 
                 moves.push(move);
@@ -329,27 +338,15 @@ class EnglishPegSolitaire extends PegSolitaireState{
         return [];
     }
 
-    print() {
-        console.log(this.board.map((row, i) => row.join(" ") + "  |  " + EnglishPegSolitaire.POSITION_KEY[i].join(" ")).join("\n"))
+    static getPositionFromString(posStr) {
+        return EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(posStr);
     }
 
-    printHoles() {
-        console.log([...this.holes].map(hole => EnglishPegSolitaire.getPositionStr(hole)));
+    static getPositionString(pos) {
+        return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(PegSolitaireState.getPositionKey(pos));
     }
 
-    printMoves() {
-        console.log([...this.moves].map(move => EnglishPegSolitaire.getMoveStr(move)));
-    }
-
-    isSolved() {
-        return this.holes.size == 32 && !this.holes.has("3,3");
-    }
-
-    static getPositionStr(pos) {
-        return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(PegSolitaireState.getHoleKey(pos));
-    }
-
-    static getMoveStr(move) {
+    static getMoveString(move) {
         return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(move.slice(0,2)) + "-" + EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(move.slice(2,4));
     }
 };
