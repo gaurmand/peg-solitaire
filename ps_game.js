@@ -16,7 +16,7 @@ promptMove();
 function promptMove() {
     rl.question('Enter your move (e.g. \"e-x\"): ', (moveStr) => {
         if(moveStr == "moves") {
-            console.log(game.getMoves());
+            game.printMoves();
         }else if(moveStr == "print") {
             game.print();
         }else if(moveStr == "holes") {

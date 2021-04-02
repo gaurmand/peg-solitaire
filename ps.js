@@ -22,7 +22,7 @@ class PegSolitaireState {
             } else {
                 switch(char) {
                     case "o":
-                        this.holes.add(row + "," + col);
+                        this.holes.add(row.toString() + col.toString());
                     case ".":
                         this.board[row].push(char);
                         col++
@@ -43,8 +43,19 @@ class PegSolitaireState {
         this.minCol = 0;
         this.maxRow = this.board.length - 1;
         this.maxCol = this.board[0].length - 1;
+        this.updateMoves();
+    }
 
-        // console.log(this.holes);
+    updateMoves() {
+        this.moves = new Set(this.computeMoves().map(move => PegSolitaireState.getMoveKey(move)));
+    }
+
+    static getMoveKey(move) {
+        return move.srcPeg[0].toString() + move.srcPeg[1].toString() + move.hole[0].toString() + move.hole[1].toString();
+    }
+
+    static getHoleKey(hole) {
+        return hole[0].toString() + hole[1].toString();
     }
 
     static isValidInitString(str) {
@@ -84,26 +95,31 @@ class PegSolitaireState {
     }
 
     getMoves() {
+        return [...this.moves]
+    }
+
+    computeMoves() {
         let moves = [];
-        this.holes.forEach(hole => {
-            let row = parseInt(hole[0]);
-            let col = parseInt(hole[2]);
+        this.holes.forEach(holeStr => {
+            let row = parseInt(holeStr[0]);
+            let col = parseInt(holeStr[1]);
+            let hole = [row, col];
 
             //check above peg
             if(row-2 >= this.minRow && this.board[row-2][col] === "." && this.board[row-1][col] === ".") {
-                moves.push({src: [row-2,col], hole: hole});
+                moves.push({srcPeg: [row-2,col], hole: hole});
             }
             //check below peg
             if(row+2 <= this.maxRow && this.board[row+2][col] === "." && this.board[row+1][col] === ".") {
-                moves.push({src: [row+2,col], hole: hole});
+                moves.push({srcPeg: [row+2,col], hole: hole});
             }
             //check left peg
             if(col-2 >= this.minCol && this.board[row][col-2] === "." && this.board[row][col-1] === ".") {
-                moves.push({src: [row,col-2], hole: hole});
+                moves.push({srcPeg: [row,col-2], hole: hole});
             }
             //check right peg
             if(col+2 <= this.maxCol && this.board[row][col+2] === "." && this.board[row][col+1] === ".") {
-                moves.push({src: [row,col+2], hole: hole});
+                moves.push({srcPeg: [row,col+2], hole: hole});
             }
         });
         return moves;
@@ -120,12 +136,14 @@ class PegSolitaireState {
         //replace moved & jumped pegs with holes
         this.board[srcPeg[0]][srcPeg[1]] = "o";
         this.board[jumpedPeg[0]][jumpedPeg[1]] = "o";
-        this.holes.add(srcPeg.join(","));
-        this.holes.add(jumpedPeg.join(","));
+        this.holes.add(PegSolitaireState.getHoleKey(srcPeg));
+        this.holes.add(PegSolitaireState.getHoleKey(jumpedPeg));
 
         //replace hole that peg jumped into with the peg
-        this.holes.delete(move.hole.join(","));
+        this.holes.delete(PegSolitaireState.getHoleKey(hole));
         this.board[row][col] = ".";
+
+        this.updateMoves();
     }
 
     isValidMoveSequence(moves) {
@@ -149,45 +167,12 @@ class PegSolitaireState {
 
     isValidMove(move) {
         //check if move contains hole and source peg
-        if(!move.hole || !move.srcPeg) {
+        if(!move.hole || !move.srcPeg || !Array.isArray(move.hole) || !Array.isArray(move.srcPeg)) {
             return false;
         }
 
-        //check if hole is in hole array
-        if(!this.holes.has(move.hole.join(","))) {
-            return false;
-        }
-
-        //check if hole position is valid position on board
-        let [row, col] = move.hole;
-        if(row < this.minRow || row > this.maxRow || col < this.minCol || col > this.maxCol) {
-            return false;
-        }
-
-        //check if source peg position is valid position on board
-        let [srow, scol] = move.srcPeg;
-        if(srow < this.minRow || srow > this.maxRow || scol < this.minCol || scol > this.maxCol) {
-            return false;
-        }
-
-        //check if board has a hole in hole position
-        if(this.board[row][col] !== "o") {
-            return false;
-        }
-
-        //check if board has a peg in source peg position
-        if(this.board[srow][scol] !== ".") {
-            return false;
-        }
-
-        //check if board has a peg in the jumped peg position
-        let jumpedPeg = PegSolitaireState.getJumpedPeg(move);
-        let [jrow, jcol] = jumpedPeg;
-        if(this.board[jrow][jcol] !== ".") {
-            return false;
-        }
-
-        return true;
+        //check if move is in move set
+        return this.moves.has(PegSolitaireState.getMoveKey(move));
     }
 
     print() {
@@ -195,7 +180,11 @@ class PegSolitaireState {
     }
 
     printHoles() {
-        console.log(...this.holes)
+        console.log(this.holes)
+    }
+
+    printMoves() {
+        console.log(this.moves)
     }
 
     printPosKey() {
@@ -212,6 +201,7 @@ class PegSolitaireState {
     restore(save) {
         this.board = save.board;
         this.holes = save.holes;
+        this.updateMoves();
     }
 
     static getJumpedPeg(move) {
