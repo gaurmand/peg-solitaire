@@ -146,6 +146,20 @@ class PegSolitaireState {
         this.updateMoves();
     }
 
+    performMoveSequence(moves) {
+        moves.forEach(move => this.performMove(move));
+    }
+
+    isValidMove(move) {
+        //check if move contains hole and source peg
+        if(!move.hole || !move.srcPeg || !Array.isArray(move.hole) || !Array.isArray(move.srcPeg)) {
+            return false;
+        }
+
+        //check if move is in move set
+        return this.moves.has(PegSolitaireState.getMoveKey(move));
+    }
+
     isValidMoveSequence(moves) {
         if(!Array.isArray(moves) || moves.length <= 0) {
             return false;
@@ -163,16 +177,6 @@ class PegSolitaireState {
             this.restore(saveState);
             return true;
         }     
-    }
-
-    isValidMove(move) {
-        //check if move contains hole and source peg
-        if(!move.hole || !move.srcPeg || !Array.isArray(move.hole) || !Array.isArray(move.srcPeg)) {
-            return false;
-        }
-
-        //check if move is in move set
-        return this.moves.has(PegSolitaireState.getMoveKey(move));
     }
 
     print() {
@@ -232,21 +236,33 @@ class EnglishPegSolitaire extends PegSolitaireState{
         super(initStr);
     }
 
-    performMove(moveStr) {
+    performMove(moveStr, checkIfValid = true) {
+        if(checkIfValid && !this.isValidMove(moveStr)) {
+            return false;
+        }
         let moves = EnglishPegSolitaire.getMovesFromString(moveStr);
-        moves.forEach(move =>  super.performMove(move));
+        this.performMoveSequence(moves);
+        return true;
     }
 
-    isValidMoveSequence(moveStr) {
+    performMoveSequence(moves) {
+        moves.forEach(move => super.performMove(move));
+    }
+
+    isValidMove(moveStr) {
         let moves = EnglishPegSolitaire.getMovesFromString(moveStr);
+        return this.isValidMoveSequence(moves); 
+    }
+
+    isValidMoveSequence(moves) {
         if(!Array.isArray(moves) || moves.length <= 0) {
             return false;
         } else if(moves.length <= 1) {
-            return this.isValidMove(moves[0]);
+            return super.isValidMove(moves[0]);
         } else {
             let saveState = this.save();
             for (let i=0; i<moves.length; i++) {
-                if(!this.isValidMove(moves[i])) {
+                if(!super.isValidMove(moves[i])) {
                     this.restore(saveState);
                     return false;
                 }

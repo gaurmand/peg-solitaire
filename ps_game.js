@@ -24,7 +24,7 @@ function promptMove() {
         }else if(moveStr == "q") {
             rl.close();
             return;
-        } else if(!game.isValidMoveSequence(moveStr)) {
+        } else if(!game.isValidMove(moveStr)) {
             console.error("Invalid move");
         } else {
             game.performMove(moveStr);
