@@ -279,11 +279,15 @@ class EnglishPegSolitaire extends PegSolitaireState{
     }
 
     printHoles() {
-        console.log([...this.holes].map(hole => EnglishPegSolitaire.getPositionStr(hole)));
+        console.log([...this.holes].map(hole => EnglishPegSolitaire.getPositionString(hole)));
     }
 
     printMoves() {
-        console.log([...this.moves].map(move => EnglishPegSolitaire.getMoveStr(move)));
+        console.log([...this.moves].map(move => EnglishPegSolitaire.getMoveString(move)));
+    }
+
+    isCompleted() {
+        return this.moves.size == 0;
     }
 
     isSolved() {

@@ -33,8 +33,12 @@ function promptMove() {
             // console.log(game.state.save());
             console.log("");
 
-            if(game.isSolved()) {
-                console.log("Congratulations, you solved the puzzle!");
+            if(game.isCompleted()) {
+                if(game.isSolved()) {
+                    console.log("Congratulations, you solved the puzzle!");
+                } else {
+                    console.log("Oh no, you have no more remaining moves");
+                }
                 rl.close();
                 return;
             }
