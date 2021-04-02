@@ -91,60 +91,41 @@ class PegSolitaireState {
 
             //check above peg
             if(row-2 >= this.minRow && this.board[row-2][col] === "." && this.board[row-1][col] === ".") {
-                moves.push({hole: hole, direction: "d" });
+                moves.push({src: [row-2,col], hole: hole});
             }
             //check below peg
             if(row+2 <= this.maxRow && this.board[row+2][col] === "." && this.board[row+1][col] === ".") {
-                moves.push({hole: hole, direction: "u" });
+                moves.push({src: [row+2,col], hole: hole});
             }
             //check left peg
             if(col-2 >= this.minCol && this.board[row][col-2] === "." && this.board[row][col-1] === ".") {
-                moves.push({hole: hole, direction: "r" });
+                moves.push({src: [row,col-2], hole: hole});
             }
             //check right peg
             if(col+2 <= this.maxCol && this.board[row][col+2] === "." && this.board[row][col+1] === ".") {
-                moves.push({hole: hole, direction: "l" });
+                moves.push({src: [row,col+2], hole: hole});
             }
         });
         return moves;
     }
 
     performMove(move) {
-        //determine positions of moved & jumped pegs
-        let [row, col] = move.hole;
-        let movedPeg, jumpedPeg;
-        switch(move.direction) {
-            case "d":
-                movedPeg = [row-2, col];
-                jumpedPeg = [row-1, col];
-                break;
-            case "u":
-                movedPeg = [row+2, col];
-                jumpedPeg = [row+1, col];
-                break;
-            case "r":
-                movedPeg = [row, col-2];
-                jumpedPeg = [row, col-1];
-                break;
-            case "l":
-                movedPeg = [row, col+2];
-                jumpedPeg = [row, col+1];
-                break;
-            default:
-                return false;
-        }
+        let hole = move.hole;
+        let srcPeg = move.srcPeg;
+        let [row, col] = hole;
+
+        //determine position of jumped peg
+        let jumpedPeg = PegSolitaireState.getJumpedPeg(move);
 
         //replace moved & jumped pegs with holes
-        this.board[movedPeg[0]][movedPeg[1]] = "o";
+        this.board[srcPeg[0]][srcPeg[1]] = "o";
         this.board[jumpedPeg[0]][jumpedPeg[1]] = "o";
-        this.holes.add(movedPeg.join(","));
+        this.holes.add(srcPeg.join(","));
         this.holes.add(jumpedPeg.join(","));
 
         //replace hole that peg jumped into with the peg
         this.holes.delete(move.hole.join(","));
         this.board[row][col] = ".";
-
-        // console.log(this.holes);
     }
 
     isValidMoveSequence(moves) {
@@ -167,8 +148,8 @@ class PegSolitaireState {
     }
 
     isValidMove(move) {
-        //check if move contains hole and direction
-        if(!move.hole || !move.direction) {
+        //check if move contains hole and source peg
+        if(!move.hole || !move.srcPeg) {
             return false;
         }
 
@@ -177,31 +158,36 @@ class PegSolitaireState {
             return false;
         }
 
-        let [row, col] = move.hole;
-
         //check if hole position is valid position on board
+        let [row, col] = move.hole;
         if(row < this.minRow || row > this.maxRow || col < this.minCol || col > this.maxCol) {
             return false;
         }
 
-        //check if hole is in hole position
+        //check if source peg position is valid position on board
+        let [srow, scol] = move.srcPeg;
+        if(srow < this.minRow || srow > this.maxRow || scol < this.minCol || scol > this.maxCol) {
+            return false;
+        }
+
+        //check if board has a hole in hole position
         if(this.board[row][col] !== "o") {
             return false;
         }
 
-        //check if pegs are in correct positions around hole
-        switch(move.direction) {
-            case "d":
-                return (row-2 >= this.minRow && this.board[row-2][col] === "." && this.board[row-1][col] === ".");
-            case "u":
-                return (row+2 <= this.maxRow && this.board[row+2][col] === "." && this.board[row+1][col] === ".");
-            case "r":
-                return (col-2 >= this.minCol && this.board[row][col-2] === "." && this.board[row][col-1] === ".")
-            case "l":
-                return (col+2 <= this.maxCol && this.board[row][col+2] === "." && this.board[row][col+1] === ".");
-            default:
-                return false;
+        //check if board has a peg in source peg position
+        if(this.board[srow][scol] !== ".") {
+            return false;
         }
+
+        //check if board has a peg in the jumped peg position
+        let jumpedPeg = PegSolitaireState.getJumpedPeg(move);
+        let [jrow, jcol] = jumpedPeg;
+        if(this.board[jrow][jcol] !== ".") {
+            return false;
+        }
+
+        return true;
     }
 
     print() {
@@ -228,21 +214,28 @@ class PegSolitaireState {
         this.holes = save.holes;
     }
 
-    static getDirection(peg, hole) {
-        if(peg[1] === hole[1]) {
-            if(peg[0] == hole[0]-2) {
-                return "d";
-            } else if(peg[0] == hole[0]+2) {
-                return "u";
+    static getJumpedPeg(move) {
+        let srcPeg = move.srcPeg;
+        let [row, col] = move.hole;
+
+        if(srcPeg[1] === col) {
+            if(srcPeg[0] === row-2) {
+                //peg above hole
+                return [row-1, col];
+            } else if(srcPeg[0] == row+2){
+                //peg below hole
+                return [row+1, col];
             }
-        } else if(peg[0] == hole[0]) {
-            if(peg[1] == hole[1]-2) {
-                return "r";
-            } else if(peg[1] == hole[1]+2) {
-                return "l";
+        } else if(srcPeg[0] === row) {
+            if(srcPeg[1] === col-2) {
+                //peg left of hole
+                return [row, col-1];
+            } else if(srcPeg[1] == col+2){
+                //peg right of hole
+                return [row, col+1];
             }
         }
-        return "";
+        return [];
     }
 };
 
@@ -258,9 +251,24 @@ class EnglishPegSolitaire extends PegSolitaireState{
         moves.forEach(move =>  super.performMove(move));
     }
 
-    isValidMoveString(moveStr) {
+    isValidMoveSequence(moveStr) {
         let moves = EnglishPegSolitaire.getMovesFromString(moveStr);
-        return this.isValidMoveSequence(moves);
+        if(!Array.isArray(moves) || moves.length <= 0) {
+            return false;
+        } else if(moves.length <= 1) {
+            return this.isValidMove(moves[0]);
+        } else {
+            let saveState = this.save();
+            for (let i=0; i<moves.length; i++) {
+                if(!this.isValidMove(moves[i])) {
+                    this.restore(saveState);
+                    return false;
+                }
+                super.performMove(moves[i]);
+            }
+            this.restore(saveState);
+            return true;
+        }     
     }
 
     static getPositionFromArray(pos) {
@@ -274,10 +282,31 @@ class EnglishPegSolitaire extends PegSolitaireState{
     static getMovesFromString(moveStr) {
         if(/[a-pA-Px][udrl]/.test(moveStr)) {
             //test if string of the form "ar" where a = hole position, r = direction of move
-            let pos = moveStr[0];
+            let holePos = moveStr[0];
             let direction = moveStr[1];
-            let hole = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(pos);
-            return [{hole, direction}];
+            let hole = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(holePos);
+            let [row, col] = hole;
+
+            //determine position of source peg
+            let srcPeg;
+            switch(direction) {
+                case "d":
+                    srcPeg = [row+2,col];
+                    break;
+                case "u":
+                    srcPeg = [row-2,col];
+                    break;
+                case "r":
+                    srcPeg = [row,col+2];
+                    break;
+                case "l":
+                    srcPeg = [row,col-2];
+                    break;
+                default:
+                    return "";
+            }
+
+            return [{srcPeg, hole}];
 
         } else if(/^([a-pA-Px]-)+[a-pA-Px]$/.test(moveStr)) {
             //test if string of the form "a-b-c" where a is the starting peg, and b,c are the subsequent holes it's moved to
@@ -285,10 +314,9 @@ class EnglishPegSolitaire extends PegSolitaireState{
             let positions = moveStr.split("-");
             let src = positions.shift();
             while(positions.length > 0) {
-                let peg = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(src);
+                let srcPeg = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(src);
                 let hole = EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(positions[0]);
-                let direction = PegSolitaireState.getDirection(peg, hole);
-                let move = {hole, direction};
+                let move = {srcPeg, hole};
 
                 moves.push(move);
                 src = positions.shift();
