@@ -45,7 +45,7 @@ class PegSolitaire {
         this.maxCol = this.board[0].length - 1;
 
         this.moveHistory = [];
-        this.initialState = this.save();
+        this.initialState = this.saveState();
         this.updateMoves();
     }
 
@@ -158,15 +158,15 @@ class PegSolitaire {
         } else if(moves.length <= 1) {
             return this.isValidMove(moves[0]);
         } else {
-            let saveState = this.save();
+            let save = this.saveState();
             for (let i=0; i<moves.length; i++) {
                 if(!this.isValidMove(moves[i])) {
-                    this.restore(saveState);
+                    this.restoreState(save);
                     return false;
                 }
                 this.performMove(moves[i]);
             }
-            this.restore(saveState);
+            this.restoreState(save);
             return true;
         }     
     }
@@ -183,21 +183,23 @@ class PegSolitaire {
         console.log([...this.moves])
     }
 
-    save() {
+    saveState() {
         return {
             board: this.board.map(row => row.slice()),
-            holes: new Set(this.holes)
+            holes: new Set(this.holes),
+            moveHistory: this.moveHistory.slice()
         };
     }
 
-    restore(save) {
-        this.board = save.board;
-        this.holes = save.holes;
+    restoreState(state) {
+        this.board = state.board;
+        this.holes = state.holes;
+        this.moveHistory = state.moveHistory;
         this.updateMoves();
     }
 
     reset() {
-        this.restore(this.initialState);
+        this.restoreState(this.initialState);
     }
     
     static isValidInitString(str) {
