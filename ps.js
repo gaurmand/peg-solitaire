@@ -187,10 +187,6 @@ class PegSolitaireState {
         console.log(this.moves)
     }
 
-    printPosKey() {
-        console.log(this.boardPositions.map(row => row.join(" ")).join("\n"))
-    }
-
     save() {
         return {
             board: this.board.map(row => row.slice()),
