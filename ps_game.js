@@ -24,24 +24,27 @@ function promptMove() {
         }else if(moveStr == "q") {
             rl.close();
             return;
-        } else if(!game.isValidMove(moveStr)) {
-            console.error("Invalid move");
         } else {
-            game.performMove(moveStr);
-            console.log("");
-            game.print();
-            // console.log(game.state.save());
-            console.log("");
-
-            if(game.isCompleted()) {
-                if(game.isSolved()) {
-                    console.log("Congratulations, you solved the puzzle!");
-                } else {
-                    console.log("Oh no, you have no more remaining moves");
+            let moves = EnglishPegSolitaire.stringToMoveSequence(moveStr);
+            if(game.isValidMoveSequence(moves)) {
+                game.performMoveSequence(moves);
+                console.log("");
+                game.print();
+                console.log("");
+    
+                if(game.isCompleted()) {
+                    if(game.isSolved()) {
+                        console.log("Congratulations, you solved the puzzle!");
+                    } else {
+                        console.log("Oh no, you have no more remaining moves");
+                    }
+                    rl.close();
+                    return;
                 }
-                rl.close();
-                return;
+            } else {
+                console.error("Invalid move");
             }
+
         }
         promptMove();
     });

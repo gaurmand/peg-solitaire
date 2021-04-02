@@ -5,69 +5,28 @@ class EnglishPegSolitaire extends PegSolitaire{
         super(initStr);
     }
 
-    performMove(moveStr, checkIfValid = true) {
-        if(checkIfValid && !this.isValidMove(moveStr)) {
-            return false;
-        }
-        let moves = EnglishPegSolitaire.getMoveSequenceFromString(moveStr);
-        this.performMoveSequence(moves);
-        return true;
-    }
-
-    performMoveSequence(moves) {
-        moves.forEach(move => super.performMove(move));
-    }
-
-    isValidMove(moveStr) {
-        let moves = EnglishPegSolitaire.getMoveSequenceFromString(moveStr);
-        return this.isValidMoveSequence(moves); 
-    }
-
-    isValidMoveSequence(moves) {
-        if(!Array.isArray(moves) || moves.length <= 0) {
-            return false;
-        } else if(moves.length <= 1) {
-            return super.isValidMove(moves[0]);
-        } else {
-            let saveState = this.save();
-            for (let i=0; i<moves.length; i++) {
-                if(!super.isValidMove(moves[i])) {
-                    this.restore(saveState);
-                    return false;
-                }
-                super.performMove(moves[i]);
-            }
-            this.restore(saveState);
-            return true;
-        }     
-    }
-
     print(printPosKey = true) {
         console.log(this.board.map((row, i) => row.join(" ") + (printPosKey ? "  |  " + EnglishPegSolitaire.POSITION_KEY[i].join(" ") : "")).join("\n"))
     }
 
     printHoles() {
-        console.log([...this.holes].map(hole => EnglishPegSolitaire.getPositionString(hole)));
+        console.log([...this.holes].map(hole => EnglishPegSolitaire.stringToPosition(hole)));
     }
 
     printMoves() {
-        console.log([...this.moves].map(move => EnglishPegSolitaire.getMoveString(move)));
-    }
-
-    isCompleted() {
-        return this.moves.size == 0;
+        console.log([...this.moves].map(move => EnglishPegSolitaire.moveToString(move)));
     }
 
     isSolved() {
-        return this.holes.size == 32 && !this.holes.has("3,3");
+        return this.holes.size == 32 && !this.holes.has("33");
     }
 
-    static getMoveSequenceFromString(moveStr) {
+    static stringToMoveSequence(moveStr) {
         if(/[a-pA-Px][udrl]/.test(moveStr)) {
             //test if string of the form "ar" where a = hole position, r = direction of move
             let holePos = moveStr[0];
             let direction = moveStr[1];
-            let hole = EnglishPegSolitaire.getPositionFromString(holePos);
+            let hole = EnglishPegSolitaire.stringToPosition(holePos);
             let [row, col] = hole;
 
             //determine position of source peg
@@ -97,8 +56,8 @@ class EnglishPegSolitaire extends PegSolitaire{
             let positions = moveStr.split("-");
             let src = positions.shift();
             while(positions.length > 0) {
-                let srcPeg = EnglishPegSolitaire.getPositionFromString(src);
-                let hole = EnglishPegSolitaire.getPositionFromString(positions[0]);
+                let srcPeg = EnglishPegSolitaire.stringToPosition(src);
+                let hole = EnglishPegSolitaire.stringToPosition(positions[0]);
                 let move = {srcPeg, hole};
 
                 moves.push(move);
@@ -110,15 +69,15 @@ class EnglishPegSolitaire extends PegSolitaire{
         return [];
     }
 
-    static getPositionFromString(posStr) {
+    static stringToPosition(posStr) {
         return EnglishPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(posStr);
     }
 
-    static getPositionString(pos) {
+    static positionToString(pos) {
         return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(EnglishPegSolitaire.getPositionKey(pos));
     }
 
-    static getMoveString(move) {
+    static moveToString(move) {
         return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(move.slice(0,2)) + "-" + EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(move.slice(2,4));
     }
 };

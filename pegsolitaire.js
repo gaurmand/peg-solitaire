@@ -77,6 +77,10 @@ class PegSolitaire {
         this.moves = new Set(moves.map(move => PegSolitaire.getMoveKey(move)));
     }
 
+    isCompleted() {
+        return this.moves.size === 0;
+    }
+
     performMove(move) {
         let hole = move.hole;
         let srcPeg = move.srcPeg;
