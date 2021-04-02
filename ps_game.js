@@ -15,13 +15,17 @@ promptMove();
 
 function promptMove() {
     rl.question('Enter your move (e.g. \"e-x\"): ', (moveStr) => {
-        if(moveStr == "moves") {
+        if(moveStr == "moves" || moveStr == "m") {
             game.printMoves();
-        }else if(moveStr == "print") {
+        } else if(moveStr == "print" || moveStr == "p") {
             game.print();
-        }else if(moveStr == "holes") {
+        } else if(moveStr == "holes" || moveStr == "h") {
             game.printHoles();
-        }else if(moveStr == "q") {
+        } else if(moveStr == "reset" || moveStr == "r") {
+            game.reset();
+        } else if(moveStr == "undo" || moveStr == "u") {
+            game.undo();
+        } else if(moveStr == "quit" || moveStr == "q") {
             rl.close();
             return;
         } else {

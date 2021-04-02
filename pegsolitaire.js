@@ -43,6 +43,9 @@ class PegSolitaire {
         this.minCol = 0;
         this.maxRow = this.board.length - 1;
         this.maxCol = this.board[0].length - 1;
+
+        this.moveHistory = [];
+        this.initialState = this.save();
         this.updateMoves();
     }
 
@@ -81,7 +84,7 @@ class PegSolitaire {
         return this.moves.size === 0;
     }
 
-    performMove(move) {
+    performMove(move, updateMoves = true) {
         let hole = move.hole;
         let srcPeg = move.srcPeg;
         let [row, col] = hole;
@@ -99,11 +102,44 @@ class PegSolitaire {
         this.holes.delete(PegSolitaire.getPositionKey(hole));
         this.board[row][col] = ".";
 
-        this.updateMoves();
+        //update move history
+        this.moveHistory.push(move);
+
+        //compute all moves and store them
+        if(updateMoves) {
+            this.updateMoves();
+        }
     }
 
     performMoveSequence(moves) {
-        moves.forEach(move => this.performMove(move));
+        moves.forEach(move => this.performMove(move, false));
+        this.updateMoves();
+    }
+
+    undo() {
+        let move = this.moveHistory.pop();
+        if(!move) {
+            return;
+        }
+        let hole = move.hole;
+        let srcPeg = move.srcPeg;
+        let [row, col] = hole;
+
+        //determine position of jumped peg
+        let jumpedPeg = PegSolitaire.getJumpedPeg(move);
+
+        //replace moved & jumped pegs(now holes) with pegs
+        this.board[srcPeg[0]][srcPeg[1]] = ".";
+        this.board[jumpedPeg[0]][jumpedPeg[1]] = ".";
+        this.holes.delete(PegSolitaire.getPositionKey(srcPeg));
+        this.holes.delete(PegSolitaire.getPositionKey(jumpedPeg));
+
+        //replace hole that peg jumped into (now a peg) with a hole
+        this.holes.add(PegSolitaire.getPositionKey(hole));
+        this.board[row][col] = "o";
+
+        //compute all moves and store them
+        this.updateMoves();
     }
 
     isValidMove(move) {
@@ -160,6 +196,9 @@ class PegSolitaire {
         this.updateMoves();
     }
 
+    reset() {
+        this.restore(this.initialState);
+    }
     
     static isValidInitString(str) {
         //check if string is valid size
