@@ -42,8 +42,8 @@ class EnglishPegSolitaire extends PegSolitaire{
         }     
     }
 
-    print() {
-        console.log(this.board.map((row, i) => row.join(" ") + "  |  " + EnglishPegSolitaire.POSITION_KEY[i].join(" ")).join("\n"))
+    print(printPosKey = true) {
+        console.log(this.board.map((row, i) => row.join(" ") + (printPosKey ? "  |  " + EnglishPegSolitaire.POSITION_KEY[i].join(" ") : "")).join("\n"))
     }
 
     printHoles() {
