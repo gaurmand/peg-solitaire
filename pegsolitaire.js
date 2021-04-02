@@ -46,15 +46,11 @@ class PegSolitaire {
         this.updateMoves();
     }
 
-    updateMoves() {
-        this.moves = new Set(this.computeMoves().map(move => PegSolitaire.getMoveKey(move)));
-    }
-
     getMoves() {
         return [...this.moves]
     }
 
-    computeMoves() {
+    updateMoves() {
         let moves = [];
         this.holes.forEach(holeStr => {
             let row = parseInt(holeStr[0]);
@@ -78,7 +74,7 @@ class PegSolitaire {
                 moves.push({srcPeg: [row,col+2], hole: hole});
             }
         });
-        return moves;
+        this.moves = new Set(moves.map(move => PegSolitaire.getMoveKey(move)));
     }
 
     performMove(move) {
