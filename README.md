@@ -1,5 +1,5 @@
 # peg-solitaire
----
+
 ### About Peg Solitaire
 
 #### How To Play
@@ -68,14 +68,14 @@ A possible peg solitaire move is shown below
 
 1) **Row-Column Notation**
 ```
-      0 1 2 3 4 5 6
-    0     . . .
-    1     x . .
-    2 . . . . . . .
-    3 . . . o . . .
-    4 y . . . . . .
-    5     . . .
-    6     . . .
+       0 1 2 3 4 5 6
+    0      . . .
+    1      x . .
+    2  . . . . . . .
+    3  . . . o . . .
+    4  y . . . . . .
+    5      . . .
+    6      . . .
 ```
 - e.g. position of x = [1, 2]
 - e.g. position of y = [4, 0]
