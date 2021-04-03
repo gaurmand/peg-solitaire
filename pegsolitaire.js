@@ -282,7 +282,7 @@ class PegSolitaire {
             return false;
         }
 
-        //check if string contains only ".", "o", and "/" characters
+        //check if string contains only numbers, ".", "o", and "/" characters
         if(!/^[\d.o/]+$/.test(str)) {
             return false;
         }
@@ -336,8 +336,6 @@ class PegSolitaire {
         return [];
     }
 };
-
-PegSolitaire.INITIAL_EUROPEAN_STATE = "2...2/1.....1/......./...o.../....../1.....1/2...2";
 
 module.exports = {
     PegSolitaire

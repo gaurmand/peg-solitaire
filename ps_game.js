@@ -1,6 +1,7 @@
 const readline = require('readline');
 
 const {EnglishPegSolitaire} = require('./englishpegsolitaire');
+const {EuropeanPegSolitaire} = require('./europeanpegsolitaire');
 
 
 const rl = readline.createInterface({
@@ -8,7 +9,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-let game = new EnglishPegSolitaire();
+let game = new EuropeanPegSolitaire();
 game.print();
 console.log("");
 promptMove();
@@ -36,7 +37,7 @@ function promptMove() {
             rl.close();
             return;
         } else {
-            let moves = EnglishPegSolitaire.stringToMoveSequence(moveStr);
+            let moves = EuropeanPegSolitaire.stringToMoveSequence(moveStr);
             if(game.isValidMoveSequence(moves)) {
                 game.performMoveSequence(moves);
                 console.log("");
