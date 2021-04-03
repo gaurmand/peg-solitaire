@@ -5,7 +5,7 @@ class PegSolitaire {
         }
 
         this.board = [[]];
-        this.holes = new Set();
+        this.holes = [];
         this.numValidPositions = 0;
 
         let row = 0;
@@ -22,7 +22,7 @@ class PegSolitaire {
             } else {
                 switch(char) {
                     case "o":
-                        this.holes.add(row.toString() + col.toString());
+                        this.holes.push([row, col]);
                     case ".":
                         this.board[row].push(char);
                         col++
@@ -50,15 +50,15 @@ class PegSolitaire {
     }
 
     getMoves() {
-        return [...this.moves]
+        return this.moves
     }
 
     updateMoves() {
         let moves = [];
-        this.holes.forEach(holeStr => {
-            let row = parseInt(holeStr[0]);
-            let col = parseInt(holeStr[1]);
-            let hole = [row, col];
+
+        for(let i=0; i<this.holes.length; i++) {
+            let hole = this.holes[i].slice();
+            let [row, col] = hole;
 
             //check above peg
             if(row-2 >= this.minRow && this.board[row-2][col] === "." && this.board[row-1][col] === ".") {
@@ -76,17 +76,17 @@ class PegSolitaire {
             if(col+2 <= this.maxCol && this.board[row][col+2] === "." && this.board[row][col+1] === ".") {
                 moves.push({srcPeg: [row,col+2], hole: hole});
             }
-        });
-        this.moves = new Set(moves.map(move => PegSolitaire.getMoveKey(move)));
+        }
+        this.moves = moves;
     }
 
     isCompleted() {
-        return this.moves.size === 0;
+        return this.moves.length === 0;
     }
 
     performMove(move, updateMoves = true) {
-        let hole = move.hole;
-        let srcPeg = move.srcPeg;
+        let hole = move.hole.slice();
+        let srcPeg = move.srcPeg.slice();
         let [row, col] = hole;
 
         //determine position of jumped peg
@@ -95,11 +95,12 @@ class PegSolitaire {
         //replace moved & jumped pegs with holes
         this.board[srcPeg[0]][srcPeg[1]] = "o";
         this.board[jumpedPeg[0]][jumpedPeg[1]] = "o";
-        this.holes.add(PegSolitaire.getPositionKey(srcPeg));
-        this.holes.add(PegSolitaire.getPositionKey(jumpedPeg));
+        this.holes.push(srcPeg);
+        this.holes.push(jumpedPeg);
 
         //replace hole that peg jumped into with the peg
-        this.holes.delete(PegSolitaire.getPositionKey(hole));
+        let res = this.holes.findIndex(ihole => ihole[0] == hole[0] && ihole[1] == hole[1]);
+        this.holes.splice(res, 1);
         this.board[row][col] = ".";
 
         //update move history
@@ -116,13 +117,13 @@ class PegSolitaire {
         this.updateMoves();
     }
 
-    undo() {
+    undo(updateMoves = true) {
         let move = this.moveHistory.pop();
         if(!move) {
             return;
         }
-        let hole = move.hole;
-        let srcPeg = move.srcPeg;
+        let hole = move.hole.slice();
+        let srcPeg = move.srcPeg.slice();
         let [row, col] = hole;
 
         //determine position of jumped peg
@@ -131,15 +132,19 @@ class PegSolitaire {
         //replace moved & jumped pegs(now holes) with pegs
         this.board[srcPeg[0]][srcPeg[1]] = ".";
         this.board[jumpedPeg[0]][jumpedPeg[1]] = ".";
-        this.holes.delete(PegSolitaire.getPositionKey(srcPeg));
-        this.holes.delete(PegSolitaire.getPositionKey(jumpedPeg));
+        let res = this.holes.findIndex(ihole => ihole[0] == srcPeg[0] && ihole[1] == srcPeg[1]);
+        this.holes.splice(res, 1);
+        res = this.holes.findIndex(ihole => ihole[0] == jumpedPeg[0] && ihole[1] == jumpedPeg[1]);
+        this.holes.splice(res, 1);
 
         //replace hole that peg jumped into (now a peg) with a hole
-        this.holes.add(PegSolitaire.getPositionKey(hole));
+        this.holes.push(hole);
         this.board[row][col] = "o";
 
         //compute all moves and store them
-        this.updateMoves();
+        if(updateMoves) {
+            this.updateMoves();
+        }
     }
 
     isValidMove(move) {
@@ -149,7 +154,8 @@ class PegSolitaire {
         }
 
         //check if move is in move set
-        return this.moves.has(PegSolitaire.getMoveKey(move));
+        let res = this.moves.findIndex(imove => imove.srcPeg[0] == move.srcPeg[0] && imove.srcPeg[1] == move.srcPeg[1] && imove.hole[0] == move.hole[0] && imove.hole[0] == move.hole[0]);
+        return res >= 0;
     }
 
     isValidMoveSequence(moves) {
@@ -176,17 +182,17 @@ class PegSolitaire {
     }
 
     printHoles() {
-        console.log([...this.holes])
+        console.log(this.holes)
     }
 
     printMoves() {
-        console.log([...this.moves])
+        console.log(this.moves)
     }
 
     saveState() {
         return {
             board: this.board.map(row => row.slice()),
-            holes: new Set(this.holes),
+            holes: this.holes.slice(),
             moveHistory: this.moveHistory.slice()
         };
     }
@@ -201,7 +207,75 @@ class PegSolitaire {
     reset() {
         this.restoreState(this.initialState);
     }
-    
+
+    //virtual methods => meant to be implemented by subclasses
+    isSolved() {}
+    hash() {}
+
+    solve(limit = 60000) {
+        let originalState = this.saveState();
+        let rootState = this.saveState();
+        rootState.moveHistory = [];
+        let fringe = [rootState];
+        let explored = new Set([this.hash()]);
+
+        let n = 0;
+        let r = 0;
+        let start = Date.now();
+
+        let printStats = () => {
+            console.log("Time: " + (Date.now()-start)/1000 + " s");
+            console.log("n: " + n);
+            console.log("r: " + r);
+        };
+
+        //DFS search for solved state
+        while(fringe.length > 0) {
+            let now = Date.now();
+            if(now-start >= limit) {
+                //time limit reached
+                printStats();
+                this.restoreState(originalState);
+                return [];
+            }
+
+            //pop node from stack
+            let currState = fringe.pop();
+            this.restoreState(currState);
+
+            if(this.isSolved()) {
+                //successful search
+                let res = this.moveHistory.slice();
+                this.restoreState(originalState);
+                printStats();
+                return res;
+            }
+
+            //expand node: push all (unexplored) successor states onto stack
+            this.moves.forEach(move => {
+                this.performMove(move, false);
+
+                let hash = this.hash();
+                if(explored.has(hash)) {
+                    //state already explored => do not add to fringe
+                    r++;
+                } else {
+                    //state is unexplored => add to fringe
+                    explored.add(hash);
+                    let newState = this.saveState();
+                    fringe.push(newState);
+                    n++;
+                }
+                this.undo(false);
+            });
+        }
+
+        //failed search
+        printStats();
+        this.restoreState(originalState);
+        return [];
+    }
+
     static isValidInitString(str) {
         //check if string is valid size
         if(!str || str.length === 0) {
@@ -260,14 +334,6 @@ class PegSolitaire {
             }
         }
         return [];
-    }
-
-    static getMoveKey(move) {
-        return move.srcPeg[0].toString() + move.srcPeg[1].toString() + move.hole[0].toString() + move.hole[1].toString();
-    }
-
-    static getPositionKey(hole) {
-        return hole[0].toString() + hole[1].toString();
     }
 };
 

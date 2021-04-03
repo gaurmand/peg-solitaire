@@ -10,15 +10,32 @@ class EnglishPegSolitaire extends PegSolitaire{
     }
 
     printHoles() {
-        console.log([...this.holes].map(hole => EnglishPegSolitaire.stringToPosition(hole)));
+        console.log(this.holes.map(hole => EnglishPegSolitaire.positionToString(hole)).sort().join(", "));
     }
 
     printMoves() {
-        console.log([...this.moves].map(move => EnglishPegSolitaire.moveToString(move)));
+        console.log(this.moves.map(move => EnglishPegSolitaire.moveToString(move)).sort().join(", "));
     }
 
     isSolved() {
-        return this.holes.size == 32 && !this.holes.has("33");
+        return this.holes.length === 32 && this.board[3][3] === ".";
+    }
+
+    solve() {
+        return super.solve().map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
+    }
+
+    hash() {
+        const getBit = char => (char === "." ? "1" : "0");
+        let str =   getBit(this.board[0][2]) + getBit(this.board[0][3]) + getBit(this.board[0][4]) + getBit(this.board[1][2]) + getBit(this.board[1][3]) + 
+                    getBit(this.board[1][4]) + getBit(this.board[2][0]) + getBit(this.board[2][1]) + getBit(this.board[2][2]) + getBit(this.board[2][3]) + 
+                    getBit(this.board[2][4]) + getBit(this.board[2][5]) + getBit(this.board[2][6]) + getBit(this.board[3][0]) + getBit(this.board[3][1]) + 
+                    getBit(this.board[3][2]) + getBit(this.board[3][3]) + getBit(this.board[3][4]) + getBit(this.board[3][5]) + getBit(this.board[3][6]) + 
+                    getBit(this.board[4][0]) + getBit(this.board[4][1]) + getBit(this.board[4][2]) + getBit(this.board[4][3]) + getBit(this.board[4][4]) + 
+                    getBit(this.board[4][5]) + getBit(this.board[4][6]) + getBit(this.board[5][2]) + getBit(this.board[5][3]) + getBit(this.board[5][4]) + 
+                    getBit(this.board[6][2]) + getBit(this.board[6][3]) + getBit(this.board[6][4]);
+
+        return parseInt(str, 2);
     }
 
     static stringToMoveSequence(moveStr) {
@@ -74,11 +91,11 @@ class EnglishPegSolitaire extends PegSolitaire{
     }
 
     static positionToString(pos) {
-        return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(EnglishPegSolitaire.getPositionKey(pos));
+        return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(pos[0].toString() + pos[1].toString());
     }
 
     static moveToString(move) {
-        return EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(move.slice(0,2)) + "-" + EnglishPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(move.slice(2,4));
+        return EnglishPegSolitaire.positionToString(move.srcPeg) + "-" + EnglishPegSolitaire.positionToString(move.hole);
     }
 };
 

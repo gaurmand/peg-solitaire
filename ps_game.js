@@ -25,6 +25,13 @@ function promptMove() {
             game.reset();
         } else if(moveStr == "undo" || moveStr == "u") {
             game.undo();
+        } else if(moveStr == "solve" || moveStr == "s") {
+            let solution = game.solve();
+            if(solution.length <= 0) {
+                console.log("No solution found");
+            } else {
+                console.log(solution);
+            }
         } else if(moveStr == "quit" || moveStr == "q") {
             rl.close();
             return;
