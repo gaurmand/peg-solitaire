@@ -5,26 +5,50 @@ class EuropeanPegSolitaire extends PegSolitaire{
         super(initStr);
     }
 
+    /**
+     * Prints the current board state and also the position key next to it
+     * @param {Boolean} printPosKey - print position key option (defaults to true)
+     */
     print(printPosKey = true) {
         console.log(this.board.map((row, i) => row.join(" ") + (printPosKey ? "  |  " + EuropeanPegSolitaire.POSITION_TO_STRING_ARRAY[i].map(pos => !pos ? " " : pos).join(" ") : "")).join("\n"))
     }
 
+    /**
+     * Prints the hole list
+     */
     printHoles() {
         console.log(this.holes.map(hole => EuropeanPegSolitaire.positionToString(hole)).sort().join(", "));
     }
 
+    /**
+     * Prints the move list
+     */
     printMoves() {
         console.log(this.moves.map(move => EuropeanPegSolitaire.moveToString(move)).sort().join(", "));
     }
 
+    /**
+     * Returns true if the puzzle is in the solved state
+     * @returns {Boolean}
+     */
     isSolved() {
         return this.holes.length === 36;
     }
 
+    /**
+     * Returns a move sequence that will take the puzzle into the solved state from its current state
+     * If not solvable, returns an empty array
+     * Caution: Search time is limited to 1 minute, if the time limit is reached assumes configuration is not solvable 
+     * @returns {Array} - The move sequence (array of move strings)
+     */
     solve() {
         return super.solve().map(move => EuropeanPegSolitaire.moveToString(move)).join(", ");
     }
 
+    /**
+     * Returns a number represnting the current board state
+     * @returns {Number}
+     */
     hash() {
         const getBit = char => (char === "." ? "1" : "0");
         let str =   
@@ -39,6 +63,12 @@ class EuropeanPegSolitaire extends PegSolitaire{
         return parseInt(str, 2);
     }
 
+    /**
+     * Converts a move string (e.g. "e-x-E") to a move sequence array (e.g. [{srcPeg: [1,3], hole: [3,3]}, {srcPeg: [3,3], hole: [5,3]}])
+     * Returns null if it fails
+     * @param {String} moveStr - The move string
+     * @returns {Array\null} - The move sequence (an array of move objects)
+     */
     static stringToMoveSequence(moveStr) {
         if(/[a-pA-PxyYzZ][udrl]/.test(moveStr)) {
             //test if string of the form "ar" where a = src peg position, r = direction of move
@@ -84,9 +114,15 @@ class EuropeanPegSolitaire extends PegSolitaire{
             return moves;
         }
 
-        return [];
+        return null;
     }
 
+    /**
+     * Converts a position string (e.g. "x") to a position (e.g. [3,3]) 
+     * Returns null if it fails
+     * @param {String} posStr - The position string
+     * @returns {Array|null} - The position [row, col]
+     */
     static stringToPosition(posStr) {
         //check if position string is valid
         let pos = EuropeanPegSolitaire.STRING_TO_POSITION_MAP.get(posStr);
@@ -97,10 +133,20 @@ class EuropeanPegSolitaire extends PegSolitaire{
         }
     }
 
+    /**
+     * Converts a position (e.g. [3,3]) to a position string (e.g. "x")
+     * @param {Array} pos - The position [row, col]
+     * @returns {String} - The position string
+     */
     static positionToString(pos) {
         return EuropeanPegSolitaire.isValidPosition(pos) ? EuropeanPegSolitaire.POSITION_TO_STRING_ARRAY[pos[0]][pos[1]] : "";
     }
 
+    /**
+     * Converts a move object (e.g. {srcPeg: [1,3], hole: [3,3]}) to a move string (e.g. "e-x")
+     * @param {Object} move - The move object
+     * @returns {String} - The move string
+     */
     static moveToString(move) {
         if(!move) {
             return "";
@@ -117,6 +163,13 @@ class EuropeanPegSolitaire extends PegSolitaire{
         }
     }
 
+    /**
+     * Returns a move object given the positions of the peg and the hole
+     * Returns null if it fails
+     * @param {Array} srcPeg - The position [row, col] of the peg that moves
+     * @param {Array} hole - The position [row, col] of the hole that the peg moves into
+     * @returns {Object|null} - The move object
+     */
     static positionsToMove(srcPeg, hole) {
         if(!EuropeanPegSolitaire.isValidPosition(srcPeg) || !EuropeanPegSolitaire.isValidPosition(hole)) {
             return null;
@@ -127,6 +180,11 @@ class EuropeanPegSolitaire extends PegSolitaire{
         return {srcPeg, hole};
     }
 
+    /**
+     * Returns true if a position is valid, false if invalid
+     * @param {Array} pos - The position [row, col]
+     * @returns {Boolean}
+     */
     static isValidPosition(pos) {
         return Array.isArray(pos) && pos.length >= 2 && pos[0] >= 0 && pos[0] <= 6 && pos[1] >= 0 && pos[1] <= 6;
     }

@@ -53,6 +53,9 @@ class PegSolitaire {
         return this.moves
     }
 
+    /**
+     * Computes all possible moves from the current state and updates the moves property
+     */
     updateMoves() {
         let moves = [];
 
@@ -80,10 +83,19 @@ class PegSolitaire {
         this.moves = moves;
     }
 
+    /**
+     * Returns true if there are no more moves possible, false otherwise
+     * @returns {Boolean}
+     */
     isCompleted() {
         return this.moves.length === 0;
     }
 
+    /**
+     * Performs the given move and updates the internal state
+     * @param {Object} move - The move to perform
+     * @param {Boolean} updateMoves - Option to update the moves (defaults to true)
+     */
     performMove(move, updateMoves = true) {
         let hole = move.hole.slice();
         let srcPeg = move.srcPeg.slice();
@@ -112,11 +124,19 @@ class PegSolitaire {
         }
     }
 
+    /**
+     * Performs the given move sequence and updates the internal state
+     * @param {Array} moves - The move sequence to perform
+     */
     performMoveSequence(moves) {
         moves.forEach(move => this.performMove(move, false));
         this.updateMoves();
     }
 
+    /**
+     * Undos the last move performed and updates the internal state
+     * @param {Boolean} updateMoves - Option to update the moves (defaults to true)
+     */
     undo(updateMoves = true) {
         let move = this.moveHistory.pop();
         if(!move) {
@@ -147,6 +167,11 @@ class PegSolitaire {
         }
     }
 
+    /**
+     * Returns true if a move is valid according to the current board state, false otherwise
+     * @param {Object} move - The move object
+     * @returns {Boolean}
+     */
     isValidMove(move) {
         //check if move contains hole and source peg
         if(!move.hole || !move.srcPeg || !Array.isArray(move.hole) || !Array.isArray(move.srcPeg)) {
@@ -158,6 +183,11 @@ class PegSolitaire {
         return res >= 0;
     }
 
+    /**
+     *  Returns true if a move sequence is valid according to the current board state, false otherwise
+     * @param {Array} moves - The move sequence (array of move objects)
+     * @returns {Boolean}
+     */
     isValidMoveSequence(moves) {
         if(!Array.isArray(moves) || moves.length <= 0) {
             return false;
@@ -177,18 +207,31 @@ class PegSolitaire {
         }     
     }
 
+    /**
+     * Prints the current board state and also the position key next to it (optional)
+     */
     print() {
         console.log(this.board.map(row => row.join(" ")).join("\n"))
     }
 
+    /**
+     * Prints the move list
+     */
     printHoles() {
         console.log(this.holes)
     }
 
+    /**
+     * Prints the hole list
+     */
     printMoves() {
         console.log(this.moves)
     }
 
+    /**
+     * Returns a state object representing the puzzle's current state
+     * @returns {Object} - The state object
+     */
     saveState() {
         return {
             board: this.board.map(row => row.slice()),
@@ -197,6 +240,10 @@ class PegSolitaire {
         };
     }
 
+    /**
+     * Restores the puzzle's state using the input state pbject
+     * @param {*} state - The state object
+     */
     restoreState(state) {
         this.board = state.board;
         this.holes = state.holes;
@@ -204,14 +251,34 @@ class PegSolitaire {
         this.updateMoves();
     }
 
+    /**
+     * Resets the puzzle state to its initial state
+     */
     reset() {
         this.restoreState(this.initialState);
     }
 
-    //virtual methods => meant to be implemented by subclasses
+    /**
+     * Returns true if the puzzle is in the solved state
+     * Virtual method: meant to be implemented by a subclass
+     * @returns {Boolean}
+     */
     isSolved() {}
+
+    /**
+     * Returns a number represnting the current board state
+     * Virtual method: meant to be implemented by a subclass
+     * @returns {Number}
+     */
     hash() {}
 
+    /**
+     * Returns a move sequence that will take the puzzle into the solved state from its current state
+     * If not solvable, returns an empty array
+     * Implementation: Uses depth-first search to find a solved state and an exploration set to prevent repeated states
+     * @param {Number} limit - The time limit (defaults to 60000 ms = 1 min)
+     * @returns {Array} - The move sequence (array of move objects)
+     */
     solve(limit = 60000) {
         let originalState = this.saveState();
         let rootState = this.saveState();
@@ -276,6 +343,11 @@ class PegSolitaire {
         return [];
     }
 
+    /**
+     * Returns true if the initialization string is valid, false otherwise
+     * @param {String} str 
+     * @returns {Boolean}
+     */
     static isValidInitString(str) {
         //check if string is valid size
         if(!str || str.length === 0) {
