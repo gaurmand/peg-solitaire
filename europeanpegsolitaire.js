@@ -6,7 +6,7 @@ class EuropeanPegSolitaire extends PegSolitaire{
     }
 
     print(printPosKey = true) {
-        console.log(this.board.map((row, i) => row.join(" ") + (printPosKey ? "  |  " + EuropeanPegSolitaire.POSITION_KEY[i].join(" ") : "")).join("\n"))
+        console.log(this.board.map((row, i) => row.join(" ") + (printPosKey ? "  |  " + EuropeanPegSolitaire.POSITION_TO_STRING_ARRAY[i].join(" ") : "")).join("\n"))
     }
 
     printHoles() {
@@ -88,11 +88,11 @@ class EuropeanPegSolitaire extends PegSolitaire{
     }
 
     static stringToPosition(posStr) {
-        return EuropeanPegSolitaire.ENGLISH_HP_TO_IP_MAP.get(posStr);
+        return EuropeanPegSolitaire.STRING_TO_POSITION_MAP.get(posStr);
     }
 
     static positionToString(pos) {
-        return EuropeanPegSolitaire.ENGLISH_IP_TO_HP_MAP.get(pos[0].toString() + pos[1].toString());
+        return EuropeanPegSolitaire.POSITION_TO_STRING_ARRAY[pos[0]][pos[1]];
     }
 
     static moveToString(move) {
@@ -101,7 +101,7 @@ class EuropeanPegSolitaire extends PegSolitaire{
 };
 
 EuropeanPegSolitaire.INTIAL_STATE = "2...2/1.....1/......./...o.../......./1.....1/2...2";
-EuropeanPegSolitaire.POSITION_KEY = [
+EuropeanPegSolitaire.POSITION_TO_STRING_ARRAY = [
     [" ", " ", "a", "b", "c", " ", " "],
     [" ", "y", "d", "e", "f", "z", " "],
     ["g", "h", "i", "j", "k", "l", "m"],
@@ -111,25 +111,15 @@ EuropeanPegSolitaire.POSITION_KEY = [
     [" ", " ", "C", "B", "A", " ", " "],
 ];
 
-EuropeanPegSolitaire.ENGLISH_HP_TO_IP_MAP = new Map([
-    ["a",[0,2]], ["b",[0,3]], ["c",[0,4]], 
-    ["y",[1,1]], ["d",[1,2]], ["e",[1,3]], ["f",[1,4]], ["z",[1,5]], 
+EuropeanPegSolitaire.STRING_TO_POSITION_MAP = new Map([
+                              ["a",[0,2]], ["b",[0,3]], ["c",[0,4]], 
+                 ["y",[1,1]], ["d",[1,2]], ["e",[1,3]], ["f",[1,4]], ["z",[1,5]], 
     ["g",[2,0]], ["h",[2,1]], ["i",[2,2]], ["j",[2,3]], ["k",[2,4]], ["l",[2,5]], ["m",[2,6]], 
     ["n",[3,0]], ["o",[3,1]], ["p",[3,2]], ["x",[3,3]], ["P",[3,4]], ["O",[3,5]], ["N",[3,6]], 
     ["M",[4,0]], ["L",[4,1]], ["K",[4,2]], ["J",[4,3]], ["I",[4,4]], ["H",[4,5]], ["G",[4,6]], 
-    ["Z",[5,1]], ["F",[5,2]], ["E",[5,3]], ["D",[5,4]], ["Y",[5,5]], 
-    ["C",[6,2]], ["B",[6,3]], ["A",[6,4]]
+                 ["Z",[5,1]], ["F",[5,2]], ["E",[5,3]], ["D",[5,4]], ["Y",[5,5]], 
+                              ["C",[6,2]], ["B",[6,3]], ["A",[6,4]]
 ]);
-
-EuropeanPegSolitaire.ENGLISH_IP_TO_HP_MAP = new Map([
-    ["02","a"], ["03","b"], ["04","c"], 
-    ["11","y"], ["12","d"], ["13","e"], ["14","f"], ["15","z"],
-    ["20","g"], ["21","h"], ["22","i"], ["23","j"], ["24","k"], ["25","l"], ["26","m"], 
-    ["30","n"], ["31","o"], ["32","p"], ["33","x"], ["34","P"], ["35","O"], ["36","N"], 
-    ["40","M"], ["41","L"], ["42","K"], ["43","J"], ["44","I"], ["45","H"], ["46","G"], 
-    ["51","Z"], ["52","F"], ["53","E"], ["54","D"], ["55","Y"],
-    ["62","C"], ["63","B"], ["64","A"]
-]); 
 
 module.exports = {
     EuropeanPegSolitaire
