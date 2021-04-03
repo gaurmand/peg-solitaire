@@ -174,7 +174,7 @@ class PegSolitaire {
      */
     isValidMove(move) {
         //check if move contains hole and source peg
-        if(!move.hole || !move.srcPeg || !Array.isArray(move.hole) || !Array.isArray(move.srcPeg)) {
+        if(!move || !Array.isArray(move.hole) || !Array.isArray(move.srcPeg)) {
             return false;
         }
 

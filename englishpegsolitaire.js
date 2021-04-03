@@ -63,10 +63,56 @@ class EnglishPegSolitaire extends PegSolitaire{
     }
 
     /**
+     * Converts a move string (e.g. "e-x") to a move object (e.g. {srcPeg: [1,3], hole: [3,3]})
+     * Returns null if it fails
+     * @param {String} moveStr - The move string
+     * @returns {Object|null} - The move object
+     */
+    static stringToMove(moveStr) {
+        if(/[a-pA-Px][udrl]/.test(moveStr)) {
+            //test if string of the form "ar" where a = src peg position, r = direction of move
+            let srcPos = moveStr[0];
+            let direction = moveStr[1];
+            let srcPeg = EnglishPegSolitaire.stringToPosition(srcPos);
+            let [row, col] = srcPeg;
+
+            //determine position of hole
+            let hole;
+            switch(direction) {
+                case "d":
+                    hole = [row+2,col];
+                    break;
+                case "u":
+                    hole = [row-2,col];
+                    break;
+                case "r":
+                    hole = [row,col+2];
+                    break;
+                case "l":
+                    hole = [row,col-2];
+                    break;
+                default:
+                    return "";
+            }
+
+            return {srcPeg, hole};
+
+        } else if(/^[a-pA-Px]-[a-pA-Px]$/.test(moveStr)) {
+            //test if string of the form "a-b" where a is the starting peg, and b is the hole it's moved to
+            let srcPeg = EnglishPegSolitaire.stringToPosition(moveStr[0]);
+            let hole = EnglishPegSolitaire.stringToPosition(moveStr[2]);
+            return {srcPeg, hole};
+
+        }
+
+        return null;
+    }
+
+    /**
      * Converts a move string (e.g. "e-x-E") to a move sequence array (e.g. [{srcPeg: [1,3], hole: [3,3]}, {srcPeg: [3,3], hole: [5,3]}])
      * Returns null if it fails
      * @param {String} moveStr - The move string
-     * @returns {Array\null} - The move sequence (an array of move objects)
+     * @returns {Array|null} - The move sequence (an array of move objects)
      */
     static stringToMoveSequence(moveStr) {
         if(/[a-pA-Px][udrl]/.test(moveStr)) {

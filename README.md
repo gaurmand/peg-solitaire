@@ -143,8 +143,7 @@ Enter your move (e.g. "e-x"): quit
 let game = new EnglishPegSolitaire();
 
 //Constructing the move "e-x" from a string
-let moveSeq = EnglishPegSolitaire.stringToMoveSequence("e-x");
-let move1 = moveSeq[0] //move sequence array contains moves
+let move1 = EnglishPegSolitaire.stringToMove("e-x");
 
 //Constructing the move "e-x" from peg & hole positions
 let pegPos = [1,3]; //e
