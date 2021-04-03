@@ -40,26 +40,26 @@ class EnglishPegSolitaire extends PegSolitaire{
 
     static stringToMoveSequence(moveStr) {
         if(/[a-pA-Px][udrl]/.test(moveStr)) {
-            //test if string of the form "ar" where a = hole position, r = direction of move
-            let holePos = moveStr[0];
+            //test if string of the form "ar" where a = src peg position, r = direction of move
+            let srcPos = moveStr[0];
             let direction = moveStr[1];
-            let hole = EnglishPegSolitaire.stringToPosition(holePos);
-            let [row, col] = hole;
+            let srcPeg = EnglishPegSolitaire.stringToPosition(srcPos);
+            let [row, col] = srcPeg;
 
-            //determine position of source peg
-            let srcPeg;
+            //determine position of hole
+            let hole;
             switch(direction) {
                 case "d":
-                    srcPeg = [row+2,col];
+                    hole = [row+2,col];
                     break;
                 case "u":
-                    srcPeg = [row-2,col];
+                    hole = [row-2,col];
                     break;
                 case "r":
-                    srcPeg = [row,col+2];
+                    hole = [row,col+2];
                     break;
                 case "l":
-                    srcPeg = [row,col-2];
+                    hole = [row,col-2];
                     break;
                 default:
                     return "";
