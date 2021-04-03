@@ -9,7 +9,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-let game = new EuropeanPegSolitaire();
+let game = new EnglishPegSolitaire();
 game.print();
 console.log("");
 promptMove();
@@ -26,6 +26,9 @@ function promptMove() {
             game.reset();
         } else if(moveStr == "undo" || moveStr == "u") {
             game.undo();
+            console.log("");
+            game.print();
+            console.log("");
         } else if(moveStr == "solve" || moveStr == "s") {
             let solution = game.solve();
             if(solution.length <= 0) {
@@ -37,7 +40,7 @@ function promptMove() {
             rl.close();
             return;
         } else {
-            let moves = EuropeanPegSolitaire.stringToMoveSequence(moveStr);
+            let moves = EnglishPegSolitaire.stringToMoveSequence(moveStr);
             if(game.isValidMoveSequence(moves)) {
                 game.performMoveSequence(moves);
                 console.log("");
