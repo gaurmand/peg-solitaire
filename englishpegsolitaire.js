@@ -6,7 +6,7 @@ class EnglishPegSolitaire extends PegSolitaire{
     }
 
     print(printPosKey = true) {
-        console.log(this.board.map((row, i) => row.join(" ") + (printPosKey ? "  |  " + EnglishPegSolitaire.POSITION_TO_STRING_ARRAY[i].join(" ") : "")).join("\n"))
+        console.log(this.board.map((row, i) => row.join(" ") + (printPosKey ? "  |  " + EnglishPegSolitaire.POSITION_TO_STRING_ARRAY[i].map(pos => !pos ? " " : pos).join(" ") : "")).join("\n"))
     }
 
     printHoles() {
@@ -87,27 +87,59 @@ class EnglishPegSolitaire extends PegSolitaire{
     }
 
     static stringToPosition(posStr) {
-        return EnglishPegSolitaire.STRING_TO_POSITION_MAP.get(posStr);
+        //check if position string is valid
+        let pos = EnglishPegSolitaire.STRING_TO_POSITION_MAP.get(posStr);
+        if(pos) {
+            return pos.slice();
+        } else {
+            return null;
+        }
     }
 
     static positionToString(pos) {
-        return EnglishPegSolitaire.POSITION_TO_STRING_ARRAY[pos[0]][pos[1]];
+        return EnglishPegSolitaire.isValidPosition(pos) ? EnglishPegSolitaire.POSITION_TO_STRING_ARRAY[pos[0]][pos[1]] : "";
     }
 
     static moveToString(move) {
-        return EnglishPegSolitaire.positionToString(move.srcPeg) + "-" + EnglishPegSolitaire.positionToString(move.hole);
+        if(!move) {
+            return "";
+        }
+
+        let src = EnglishPegSolitaire.positionToString(move.srcPeg);
+        let hole = EnglishPegSolitaire.positionToString(move.hole);
+
+        //check if move positions are valid
+        if(src && hole) {
+            return src + "-" + hole;
+        } else {
+            return "";
+        }
+    }
+
+    static positionsToMove(srcPeg, hole) {
+        if(!EnglishPegSolitaire.isValidPosition(srcPeg) || !EnglishPegSolitaire.isValidPosition(hole)) {
+            return null;
+        }
+
+        srcPeg = srcPeg.slice();
+        hole = hole.slice();
+        return {srcPeg, hole};
+    }
+
+    static isValidPosition(pos) {
+        return Array.isArray(pos) && pos.length >= 2 && pos[0] >= 0 && pos[0] <= 6 && pos[1] >= 0 && pos[1] <= 6;
     }
 };
 
 EnglishPegSolitaire.INTIAL_STATE = "2...2/2...2/......./...o.../......./2...2/2...2";
 EnglishPegSolitaire.POSITION_TO_STRING_ARRAY = [
-    [" ", " ", "a", "b", "c", " ", " "],
-    [" ", " ", "d", "e", "f", " ", " "],
+      ["", "", "a", "b", "c", "", ""],
+      ["", "", "d", "e", "f", "", ""],
     ["g", "h", "i", "j", "k", "l", "m"],
     ["n", "o", "p", "x", "P", "O", "N"],
     ["M", "L", "K", "J", "I", "H", "G"],
-    [" ", " ", "F", "E", "D", " ", " "],
-    [" ", " ", "C", "B", "A", " ", " "],
+      ["", "", "F", "E", "D", "", ""],
+      ["", "", "C", "B", "A", "", ""],
 ];
 
 EnglishPegSolitaire.STRING_TO_POSITION_MAP = new Map([
