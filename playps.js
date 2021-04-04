@@ -9,9 +9,26 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-let game = new EnglishPegSolitaire();
-game.print();
-console.log("");
+let gameType = process.argv[2];
+let GAME;
+if(!gameType || gameType.toUpperCase().startsWith("EN")) {
+    GAME = EnglishPegSolitaire;
+} else if(gameType.toUpperCase().startsWith("EU") ) {
+    GAME = EuropeanPegSolitaire;
+} else {
+    console.log("Incorrect game type specified: use \"english\" or \"european\"");
+    process.exit();
+}
+
+let game = new GAME();
+
+function printGame() {
+    console.log("");
+    game.print();
+    console.log("");
+}
+
+printGame();
 promptMove();
 
 function promptMove() {
@@ -19,19 +36,18 @@ function promptMove() {
         if(moveStr == "moves" || moveStr == "m") {
             game.printMoves();
         } else if(moveStr == "print" || moveStr == "p") {
-            game.print();
+            printGame();
         } else if(moveStr == "holes" || moveStr == "h") {
             game.printHoles();
         } else if(moveStr == "reset" || moveStr == "r") {
             game.reset();
+            printGame();
         } else if(moveStr == "undo" || moveStr == "u") {
             game.undo();
-            console.log("");
-            game.print();
-            console.log("");
+            printGame();
         } else if(moveStr == "solve" || moveStr == "s") {
             let solution = game.solve();
-            if(solution.length <= 0) {
+            if(!solution) {
                 console.log("No solution found");
             } else {
                 console.log(solution);
@@ -40,12 +56,11 @@ function promptMove() {
             rl.close();
             return;
         } else {
-            let moves = EnglishPegSolitaire.stringToMoveSequence(moveStr);
+            let moves = GAME.stringToMoveSequence(moveStr);
+
             if(game.isValidMoveSequence(moves)) {
                 game.performMoveSequence(moves);
-                console.log("");
-                game.print();
-                console.log("");
+                printGame();
     
                 if(game.isCompleted()) {
                     if(game.isSolved()) {
@@ -59,7 +74,6 @@ function promptMove() {
             } else {
                 console.error("Invalid move");
             }
-
         }
         promptMove();
     });

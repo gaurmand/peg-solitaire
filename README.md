@@ -99,7 +99,8 @@ A possible peg solitaire move is shown below
 
 You can play a simple command-line based version of peg solitaire provided you have Node.js installed
 ```
-$ node ps_game.js
+$ node playps.js english
+
     . . .      |      a b c
     . . .      |      d e f
 . . . . . . .  |  g h i j k l m
