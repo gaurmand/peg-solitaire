@@ -172,8 +172,8 @@ game.print();
 //TODO: optimize this function
 let solution = game.solve();
 
-//Empty array returned if not solvable (or timeout)
-if(solution.length === 0) {
+//solve() returns null if not solvable (or timeout)
+if(!solution) {
     console.log("The puzzle is not solvable");
 }
 ```

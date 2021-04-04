@@ -274,10 +274,10 @@ class PegSolitaire {
 
     /**
      * Returns a move sequence that will take the puzzle into the solved state from its current state
-     * If not solvable, returns an empty array
+     * If not solvable, returns null
      * Implementation: Uses depth-first search to find a solved state and an exploration set to prevent repeated states
      * @param {Number} limit - The time limit (defaults to 60000 ms = 1 min)
-     * @returns {Array} - The move sequence (array of move objects)
+     * @returns {Array|null} - The move sequence (array of move objects)
      */
     solve(limit = 60000) {
         let originalState = this.saveState();
@@ -301,9 +301,9 @@ class PegSolitaire {
             let now = Date.now();
             if(now-start >= limit) {
                 //time limit reached
-                printStats();
+                // printStats();
                 this.restoreState(originalState);
-                return [];
+                return null;
             }
 
             //pop node from stack
@@ -314,7 +314,7 @@ class PegSolitaire {
                 //successful search
                 let res = this.moveHistory.slice();
                 this.restoreState(originalState);
-                printStats();
+                // printStats();
                 return res;
             }
 
@@ -338,9 +338,9 @@ class PegSolitaire {
         }
 
         //failed search
-        printStats();
+        // printStats();
         this.restoreState(originalState);
-        return [];
+        return null;
     }
 
     /**
