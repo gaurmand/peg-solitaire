@@ -39,11 +39,10 @@ class EuropeanPegSolitaire extends PegSolitaire{
      * Returns a move sequence that will take the puzzle into the solved state from its current state
      * If not solvable, returns null
      * Caution: Search time is limited, if the time limit is reached, assumes configuration is not solvable 
-     * @param {Number} limit - The time limit (defaults to 60000 ms = 1 min)
      * @returns {Array|null} - The move sequence (array of move strings)
      */
-    solve(limit = 60000) {
-        let solution = super.solve(limit);
+    solve() {
+        let solution = super.solve();
         if(solution) {
             return solution.map(move => EuropeanPegSolitaire.moveToString(move)).join(", ");
         } else {

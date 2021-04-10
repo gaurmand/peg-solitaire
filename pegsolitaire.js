@@ -275,46 +275,42 @@ class PegSolitaire {
     /**
      * Returns a move sequence that will take the puzzle into the solved state from its current state
      * If not solvable, returns null
-     * Implementation: Uses depth-first search to find a solved state and an exploration set to prevent repeated states
-     * @param {Number} limit - The time limit (defaults to 60000 ms = 1 min)
      * @returns {Array|null} - The move sequence (array of move objects)
      */
-    solve(limit = 60000) {
+    solve() {
         let originalState = this.saveState();
+        let res = this.DFSSearch(() => this.hash(), () => this.isSolved());
+        this.restoreState(originalState);
+        this.printSearchStats();
+        return res;
+    }
+
+    DFSSearch(getStateID, isGoal) {
         let rootState = this.saveState();
         rootState.moveHistory = [];
-        let fringe = [rootState];
-        let explored = new Set([this.hash()]);
+        let stack = [rootState];
+        let explored = new Set([getStateID()]);
 
-        let n = 0;
-        let r = 0;
-        let start = Date.now();
+        this.numExploredStates = 0;
+        this.numRepeatedStates = 0;
+        this.searchStartTime = Date.now();
 
-        let printStats = () => {
-            console.log("Time: " + (Date.now()-start)/1000 + " s");
-            console.log("n: " + n);
-            console.log("r: " + r);
-        };
+        while(stack.length > 0) {
 
-        //DFS search for solved state
-        while(fringe.length > 0) {
-            let now = Date.now();
-            if(now-start >= limit) {
+            if(Date.now() - this.searchStartTime > PegSolitaire.SEARCH_TIME_LIMIT) {
                 //time limit reached
-                // printStats();
-                this.restoreState(originalState);
+                console.log("timeout")
                 return null;
             }
 
             //pop node from stack
-            let currState = fringe.pop();
+            let currState = stack.pop();
             this.restoreState(currState);
 
-            if(this.isSolved()) {
+            if(isGoal()) {
                 //successful search
+                console.log("success")
                 let res = this.moveHistory.slice();
-                this.restoreState(originalState);
-                // printStats();
                 return res;
             }
 
@@ -322,25 +318,30 @@ class PegSolitaire {
             this.moves.forEach(move => {
                 this.performMove(move, false);
 
-                let hash = this.hash();
+                let hash = getStateID();
                 if(explored.has(hash)) {
-                    //state already explored => do not add to fringe
-                    r++;
+                    //state already explored => do not add to stack
+                    this.numRepeatedStates++;
                 } else {
-                    //state is unexplored => add to fringe
+                    //state is unexplored => add to stack
                     explored.add(hash);
                     let newState = this.saveState();
-                    fringe.push(newState);
-                    n++;
+                    stack.push(newState);
+                    this.numExploredStates++;
                 }
                 this.undo(false);
             });
         }
-
+        
         //failed search
-        // printStats();
-        this.restoreState(originalState);
+        console.log("fail")
         return null;
+    }
+
+    printSearchStats() {
+        console.log("Time: " + (Date.now()-this.searchStartTime)/1000 + " s");
+        console.log("n: " + this.numExploredStates);
+        console.log("r: " + this.numRepeatedStates);
     }
 
     /**
@@ -408,6 +409,8 @@ class PegSolitaire {
         return [];
     }
 };
+
+PegSolitaire.SEARCH_TIME_LIMIT = 30000;
 
 module.exports = {
     PegSolitaire
