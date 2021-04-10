@@ -52,6 +52,13 @@ function promptMove() {
             } else {
                 console.log(solution);
             }
+        } else if(moveStr == "altsolve" || moveStr == "a") {
+            let solution = game.altSolve();
+            if(!solution) {
+                console.log("No solution found");
+            } else {
+                console.log(solution);
+            }
         } else if(moveStr == "quit" || moveStr == "q") {
             rl.close();
             return;

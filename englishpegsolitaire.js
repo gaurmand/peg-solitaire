@@ -35,6 +35,10 @@ class EnglishPegSolitaire extends PegSolitaire{
         return this.holes.length === 32 && this.board[3][3] === ".";
     }
 
+    isOnePegRemaining() {
+        return this.holes.length === 32
+    }
+
     /**
      * Returns a move sequence that will take the puzzle into the solved state from its current state
      * If not solvable, returns null
@@ -43,6 +47,22 @@ class EnglishPegSolitaire extends PegSolitaire{
      */
     solve() {
         let solution = super.solve(()=>this.hash(), ()=>this.isSolved());
+        if(solution) {
+            return solution.map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
+        } else {
+            return null;
+        }
+    }
+
+    
+    /**
+     * Returns a move sequence that will take the puzzle into a state with one peg remaining at any location
+     * If not solvable, returns null
+     * Caution: Search time is limited, if the time limit is reached, assumes configuration is not solvable 
+     * @returns {Array|null} - The move sequence (array of move strings)
+     */
+    altSolve() {
+        let solution = super.randomSolve(()=>this.hash(), ()=>this.isOnePegRemaining());
         if(solution) {
             return solution.map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
         } else {
