@@ -256,6 +256,7 @@ class PegSolitaire {
      */
     reset() {
         this.restoreState(this.initialState);
+        this.initialState = this.saveState();
     }
 
     solve(getStateID, isGoalState, randomize = false) {
