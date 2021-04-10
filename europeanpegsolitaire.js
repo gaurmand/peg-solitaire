@@ -42,7 +42,7 @@ class EuropeanPegSolitaire extends PegSolitaire{
      * @returns {Array|null} - The move sequence (array of move strings)
      */
     solve() {
-        let solution = super.solve(()=>this.hash(), ()=>this.isSolved());
+        let solution = super.solve(()=>this.stateToInt(), ()=>this.isSolved());
         if(solution) {
             return solution.map(move => EuropeanPegSolitaire.moveToString(move)).join(", ");
         } else {
@@ -54,18 +54,19 @@ class EuropeanPegSolitaire extends PegSolitaire{
      * Returns a number represnting the current board state
      * @returns {Number}
      */
-    hash() {
-        const getBit = char => (char === "." ? "1" : "0");
-        let str =   
-            getBit(this.board[0][2]) + getBit(this.board[0][3]) + getBit(this.board[0][4]) + 
-            getBit(this.board[1][1]) + getBit(this.board[1][2]) + getBit(this.board[1][3]) + getBit(this.board[1][4]) + getBit(this.board[1][5]) +
-            getBit(this.board[2][0]) + getBit(this.board[2][1]) + getBit(this.board[2][2]) + getBit(this.board[2][3]) + getBit(this.board[2][4]) + getBit(this.board[2][5]) + getBit(this.board[2][6]) + 
-            getBit(this.board[3][0]) + getBit(this.board[3][1]) + getBit(this.board[3][2]) + getBit(this.board[3][3]) + getBit(this.board[3][4]) + getBit(this.board[3][5]) + getBit(this.board[3][6]) + 
-            getBit(this.board[4][0]) + getBit(this.board[4][1]) + getBit(this.board[4][2]) + getBit(this.board[4][3]) + getBit(this.board[4][4]) + getBit(this.board[4][5]) + getBit(this.board[4][6]) + 
-            getBit(this.board[5][1]) + getBit(this.board[5][2]) + getBit(this.board[5][3]) + getBit(this.board[5][4]) + getBit(this.board[5][5]) +
-            getBit(this.board[6][2]) + getBit(this.board[6][3]) + getBit(this.board[6][4]);
+     stateToInt() {
+        const g = char => (char === "." ? "1" : "0");
+        const b = this.board;
 
-        return parseInt(str, 2);
+        const r0 =                           g(b[0][2]) + g(b[0][3]) + g(b[0][4]);
+        const r1 =              g(b[1][1]) + g(b[1][2]) + g(b[1][3]) + g(b[1][4]) + g(b[1][5]);
+        const r2 = g(b[2][0]) + g(b[2][1]) + g(b[2][2]) + g(b[2][3]) + g(b[2][4]) + g(b[2][5]) + g(b[2][6]);
+        const r3 = g(b[3][0]) + g(b[3][1]) + g(b[3][2]) + g(b[3][3]) + g(b[3][4]) + g(b[3][5]) + g(b[3][6]);
+        const r4 = g(b[4][0]) + g(b[4][1]) + g(b[4][2]) + g(b[4][3]) + g(b[4][4]) + g(b[4][5]) + g(b[4][6]);
+        const r5 =              g(b[5][1]) + g(b[5][2]) + g(b[5][3]) + g(b[5][4]) + g(b[5][5]);
+        const r6 =                           g(b[6][2]) + g(b[6][3]) + g(b[6][4]);
+
+        return parseInt(r0 + r1 + r2 + r3 + r4 + r5 + r6, 2);
     }
 
         /**
