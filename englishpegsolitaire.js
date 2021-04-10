@@ -24,7 +24,7 @@ class EnglishPegSolitaire extends PegSolitaire{
      * Prints the move list
      */
     printMoves() {
-        console.log(this.moves.map(move => EnglishPegSolitaire.moveToString(move)).sort().join(", "));
+        console.log(EnglishPegSolitaire.moveSequenceToString(this.moves));
     }
 
     /**
@@ -48,7 +48,7 @@ class EnglishPegSolitaire extends PegSolitaire{
     solve() {
         let solution = super.solve(()=>this.stateToInt(), ()=>this.isSolved());
         if(solution) {
-            return solution.map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
+            return EnglishPegSolitaire.moveSequenceToString(solution);
         } else {
             return null;
         }
@@ -63,7 +63,7 @@ class EnglishPegSolitaire extends PegSolitaire{
     altSolve() {
         let solution = super.solve(()=>this.stateToInt(), ()=>this.isOnePegRemaining(), true);
         if(solution) {
-            return solution.map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
+            return EnglishPegSolitaire.moveSequenceToString(solution);
         } else {
             return null;
         }
@@ -72,7 +72,7 @@ class EnglishPegSolitaire extends PegSolitaire{
     optSolve() {
         let solution = super.solve(()=>this.classToInt(), ()=>this.isSolved());
         if(solution) {
-            return solution.map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
+            return EnglishPegSolitaire.moveSequenceToString(solution);
         } else {
             return null;
         }
@@ -103,7 +103,7 @@ class EnglishPegSolitaire extends PegSolitaire{
                 min = h[i];
             }
         }
-        
+
         return parseInt(min, 2);
     }
 
@@ -306,6 +306,13 @@ class EnglishPegSolitaire extends PegSolitaire{
         } else {
             return "";
         }
+    }
+
+    static moveSequenceToString(moveseq) {
+        if(!Array.isArray(moveseq)) {
+            return false;
+        }
+        return moveseq.map(move => EnglishPegSolitaire.moveToString(move)).sort().join(", ");
     }
 
     /**

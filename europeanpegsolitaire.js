@@ -24,7 +24,7 @@ class EuropeanPegSolitaire extends PegSolitaire{
      * Prints the move list
      */
     printMoves() {
-        console.log(this.moves.map(move => EuropeanPegSolitaire.moveToString(move)).sort().join(", "));
+        console.log(EuropeanPegSolitaire.moveSequenceToString(this.moves));
     }
 
     /**
@@ -44,7 +44,7 @@ class EuropeanPegSolitaire extends PegSolitaire{
     solve() {
         let solution = super.solve(()=>this.stateToInt(), ()=>this.isSolved());
         if(solution) {
-            return solution.map(move => EuropeanPegSolitaire.moveToString(move)).join(", ");
+            return EuropeanPegSolitaire.moveSequenceToString(solution);
         } else {
             return null;
         }
@@ -213,6 +213,13 @@ class EuropeanPegSolitaire extends PegSolitaire{
         } else {
             return "";
         }
+    }
+
+    static moveSequenceToString(moveseq) {
+        if(!Array.isArray(moveseq)) {
+            return false;
+        }
+        return moveseq.map(move => EuropeanPegSolitaire.moveToString(move)).sort().join(", ");
     }
 
     /**
