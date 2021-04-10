@@ -276,7 +276,7 @@ class PegSolitaire {
         this.isGoalState = isGoalState;
 
         let res = this.randomizedDFS();
-        
+
         this.restoreState(originalState);
         this.printSearchStats();
         return res;
@@ -429,7 +429,7 @@ class PegSolitaire {
     }
 };
 
-PegSolitaire.SEARCH_TIME_LIMIT = 30000;
+PegSolitaire.SEARCH_TIME_LIMIT = 60000;
 
 module.exports = {
     PegSolitaire

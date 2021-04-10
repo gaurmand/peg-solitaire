@@ -46,7 +46,7 @@ class EnglishPegSolitaire extends PegSolitaire{
      * @returns {Array|null} - The move sequence (array of move strings)
      */
     solve() {
-        let solution = super.solve(()=>this.hash(), ()=>this.isSolved());
+        let solution = super.solve(()=>this.stateToInt(), ()=>this.isSolved());
         if(solution) {
             return solution.map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
         } else {
@@ -62,7 +62,7 @@ class EnglishPegSolitaire extends PegSolitaire{
      * @returns {Array|null} - The move sequence (array of move strings)
      */
     altSolve() {
-        let solution = super.randomSolve(()=>this.hash(), ()=>this.isOnePegRemaining());
+        let solution = super.randomSolve(()=>this.stateToInt(), ()=>this.isOnePegRemaining());
         if(solution) {
             return solution.map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
         } else {
@@ -70,21 +70,95 @@ class EnglishPegSolitaire extends PegSolitaire{
         }
     }
 
-    /**
-     * Returns a number represnting the current board state
-     * @returns {Number}
-     */
-    hash() {
-        const getBit = char => (char === "." ? "1" : "0");
-        let str =   getBit(this.board[0][2]) + getBit(this.board[0][3]) + getBit(this.board[0][4]) + getBit(this.board[1][2]) + getBit(this.board[1][3]) + 
-                    getBit(this.board[1][4]) + getBit(this.board[2][0]) + getBit(this.board[2][1]) + getBit(this.board[2][2]) + getBit(this.board[2][3]) + 
-                    getBit(this.board[2][4]) + getBit(this.board[2][5]) + getBit(this.board[2][6]) + getBit(this.board[3][0]) + getBit(this.board[3][1]) + 
-                    getBit(this.board[3][2]) + getBit(this.board[3][3]) + getBit(this.board[3][4]) + getBit(this.board[3][5]) + getBit(this.board[3][6]) + 
-                    getBit(this.board[4][0]) + getBit(this.board[4][1]) + getBit(this.board[4][2]) + getBit(this.board[4][3]) + getBit(this.board[4][4]) + 
-                    getBit(this.board[4][5]) + getBit(this.board[4][6]) + getBit(this.board[5][2]) + getBit(this.board[5][3]) + getBit(this.board[5][4]) + 
-                    getBit(this.board[6][2]) + getBit(this.board[6][3]) + getBit(this.board[6][4]);
+    optSolve() {
+        let solution = super.solve(()=>this.classToInt(), ()=>this.isSolved());
+        if(solution) {
+            return solution.map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
+        } else {
+            return null;
+        }
+    }
 
-        return parseInt(str, 2);
+    stateToInt() {
+        const g = char => (char === "." ? "1" : "0");
+        const b = this.board;
+
+        const r0 =                           g(b[0][2]) + g(b[0][3]) + g(b[0][4]);
+        const r1 =              g(b[1][1]) + g(b[1][2]) + g(b[1][3]) + g(b[1][4]) + g(b[1][5]);
+        const r2 = g(b[2][0]) + g(b[2][1]) + g(b[2][2]) + g(b[2][3]) + g(b[2][4]) + g(b[2][5]) + g(b[2][6]);
+        const r3 = g(b[3][0]) + g(b[3][1]) + g(b[3][2]) + g(b[3][3]) + g(b[3][4]) + g(b[3][5]) + g(b[3][6]);
+        const r4 = g(b[4][0]) + g(b[4][1]) + g(b[4][2]) + g(b[4][3]) + g(b[4][4]) + g(b[4][5]) + g(b[4][6]);
+        const r5 =              g(b[5][1]) + g(b[5][2]) + g(b[5][3]) + g(b[5][4]) + g(b[5][5]);
+        const r6 =                           g(b[6][2]) + g(b[6][3]) + g(b[6][4]);
+
+        return parseInt(r0 + r1 + r2 + r3 + r4 + r5 + r6, 2);
+    }
+
+    classToInt() {
+        let h = this.getCongruenceClass();
+        let min = h[0];
+        for(let i=1; i<8; i++) {
+            if(h[i] < min) {
+                min = h[i];
+            }
+        }
+        // let res = BigInt("0b"+min);
+        return parseInt(min, 2);
+    }
+
+    getCongruenceClass() {
+        const g = char => (char === "." ? "1" : "0");
+        const b = this.board;
+
+        //row bit patterns
+        const r0 =                           g(b[0][2]) + g(b[0][3]) + g(b[0][4]);
+        const r1 =              g(b[1][1]) + g(b[1][2]) + g(b[1][3]) + g(b[1][4]) + g(b[1][5]);
+        const r2 = g(b[2][0]) + g(b[2][1]) + g(b[2][2]) + g(b[2][3]) + g(b[2][4]) + g(b[2][5]) + g(b[2][6]);
+        const r3 = g(b[3][0]) + g(b[3][1]) + g(b[3][2]) + g(b[3][3]) + g(b[3][4]) + g(b[3][5]) + g(b[3][6]);
+        const r4 = g(b[4][0]) + g(b[4][1]) + g(b[4][2]) + g(b[4][3]) + g(b[4][4]) + g(b[4][5]) + g(b[4][6]);
+        const r5 =              g(b[5][1]) + g(b[5][2]) + g(b[5][3]) + g(b[5][4]) + g(b[5][5]);
+        const r6 =                           g(b[6][2]) + g(b[6][3]) + g(b[6][4]);
+
+        //column bit patterns
+        const c0 =                           g(b[2][0]) + g(b[3][0]) + g(b[4][0]);
+        const c1 =              g(b[1][1]) + g(b[2][1]) + g(b[3][1]) + g(b[4][1]) + g(b[5][1]);
+        const c2 = g(b[0][2]) + g(b[1][2]) + g(b[2][2]) + g(b[3][2]) + g(b[4][2]) + g(b[5][2]) + g(b[6][2]);
+        const c3 = g(b[0][3]) + g(b[1][3]) + g(b[2][3]) + g(b[3][3]) + g(b[4][3]) + g(b[5][3]) + g(b[6][3]);
+        const c4 = g(b[0][4]) + g(b[1][4]) + g(b[2][4]) + g(b[3][4]) + g(b[4][4]) + g(b[5][4]) + g(b[6][4]);
+        const c5 =              g(b[1][5]) + g(b[2][5]) + g(b[3][5]) + g(b[4][5]) + g(b[5][5]);
+        const c6 =                           g(b[2][6]) + g(b[3][6]) + g(b[4][6]);
+
+        //reverse row bit patterns
+        const rr0 =                           g(b[0][4]) + g(b[0][3]) + g(b[0][2]);
+        const rr1 =              g(b[1][5]) + g(b[1][4]) + g(b[1][3]) + g(b[1][2]) + g(b[1][1]);
+        const rr2 = g(b[2][6]) + g(b[2][5]) + g(b[2][4]) + g(b[2][3]) + g(b[2][2]) + g(b[2][1]) + g(b[2][0]);
+        const rr3 = g(b[3][6]) + g(b[3][5]) + g(b[3][4]) + g(b[3][3]) + g(b[3][2]) + g(b[3][1]) + g(b[3][0]);
+        const rr4 = g(b[4][6]) + g(b[4][5]) + g(b[4][4]) + g(b[4][3]) + g(b[4][2]) + g(b[4][1]) + g(b[4][0]);
+        const rr5 =              g(b[5][5]) + g(b[5][4]) + g(b[5][3]) + g(b[5][2]) + g(b[5][1]);
+        const rr6 =                           g(b[6][4]) + g(b[6][3]) + g(b[6][2]);
+
+        //reverse column bit patterns
+        const rc0 =                           g(b[4][0]) + g(b[3][0]) + g(b[2][0]);
+        const rc1 =              g(b[5][1]) + g(b[4][1]) + g(b[3][1]) + g(b[2][1]) + g(b[1][1]);
+        const rc2 = g(b[6][2]) + g(b[5][2]) + g(b[4][2]) + g(b[3][2]) + g(b[2][2]) + g(b[1][2]) + g(b[0][2]);
+        const rc3 = g(b[6][3]) + g(b[5][3]) + g(b[4][3]) + g(b[3][3]) + g(b[2][3]) + g(b[1][3]) + g(b[0][3]);
+        const rc4 = g(b[6][4]) + g(b[5][4]) + g(b[4][4]) + g(b[3][4]) + g(b[2][4]) + g(b[1][4]) + g(b[0][4]);
+        const rc5 =              g(b[5][5]) + g(b[4][5]) + g(b[3][5]) + g(b[2][5]) + g(b[1][5]);
+        const rc6 =                           g(b[4][6]) + g(b[3][6]) + g(b[2][6]);
+
+        //compute congruent row hashes
+        let h0 = r0 + r1 + r2 + r3 + r4 + r5 + r6;
+        let h1 = r6 + r5 + r4 + r3 + r2 + r1 + r0;
+        let h2 = rr0 + rr1 + rr2 + rr3 + rr4 + rr5 + rr6;
+        let h3 = rr6 + rr5 + rr4 + rr3 + rr2 + rr1 + rr0;
+
+        //compute congruent column hashes
+        let h4 = c0 + c1 + c2 + c3 + c4 + c5 + c6;
+        let h5 = c6 + c5 + c4 + c3 + c2 + c1 + c0;
+        let h6 = rc0 + rc1 + rc2 + rc3 + rc4 + rc5 + rc6;
+        let h7 = rc6 + rc5 + rc4 + rc3 + rc2 + rc1 + rc0;
+
+        return [h0, h1, h2, h3, h4, h5, h6, h7];
     }
 
     /**
