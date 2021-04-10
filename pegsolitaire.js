@@ -179,7 +179,7 @@ class PegSolitaire {
         }
 
         //check if move is in move set
-        let res = this.moves.findIndex(imove => imove.srcPeg[0] == move.srcPeg[0] && imove.srcPeg[1] == move.srcPeg[1] && imove.hole[0] == move.hole[0] && imove.hole[0] == move.hole[0]);
+        let res = this.moves.findIndex(imove => imove.srcPeg[0] == move.srcPeg[0] && imove.srcPeg[1] == move.srcPeg[1] && imove.hole[0] == move.hole[0] && imove.hole[1] == move.hole[1]);
         return res >= 0;
     }
 
