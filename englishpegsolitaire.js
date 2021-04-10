@@ -42,7 +42,7 @@ class EnglishPegSolitaire extends PegSolitaire{
      * @returns {Array|null} - The move sequence (array of move strings)
      */
     solve() {
-        let solution = super.solve();
+        let solution = super.solve(()=>this.hash(), ()=>this.isSolved());
         if(solution) {
             return solution.map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
         } else {

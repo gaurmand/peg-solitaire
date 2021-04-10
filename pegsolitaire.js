@@ -258,90 +258,109 @@ class PegSolitaire {
         this.restoreState(this.initialState);
     }
 
-    /**
-     * Returns true if the puzzle is in the solved state
-     * Virtual method: meant to be implemented by a subclass
-     * @returns {Boolean}
-     */
-    isSolved() {}
-
-    /**
-     * Returns a number represnting the current board state
-     * Virtual method: meant to be implemented by a subclass
-     * @returns {Number}
-     */
-    hash() {}
-
-    /**
-     * Returns a move sequence that will take the puzzle into the solved state from its current state
-     * If not solvable, returns null
-     * @returns {Array|null} - The move sequence (array of move objects)
-     */
-    solve() {
+    solve(getStateID, isGoalState) {
         let originalState = this.saveState();
-        let res = this.DFSSearch(() => this.hash(), () => this.isSolved());
+        this.getStateID = getStateID;
+        this.isGoalState = isGoalState;
+
+        let res = this.DFSSearch();
+
         this.restoreState(originalState);
         this.printSearchStats();
         return res;
     }
 
-    DFSSearch(getStateID, isGoal) {
+    randomSolve(getStateID, isGoalState) {
+        let originalState = this.saveState();
+        this.getStateID = getStateID;
+        this.isGoalState = isGoalState;
+
+        let res = this.randomizedDFS();
+        
+        this.restoreState(originalState);
+        this.printSearchStats();
+        return res;
+    }
+
+    DFSSearch() {
+        this.initializeSearch();
+        while(this.stack.length > 0) {
+            if(Date.now() - this.searchStartTime > PegSolitaire.SEARCH_TIME_LIMIT) {
+                return null;
+            }
+            this.popNode();
+            if(this.isGoalState()) {
+                return this.moveHistory.slice();;
+            }
+            this.expandNode()
+        }
+        return null;
+    }
+
+    randomizedDFS() {
+        this.initializeSearch();
+        while(this.stack.length > 0) {
+            if(Date.now() - this.searchStartTime > PegSolitaire.SEARCH_TIME_LIMIT) {
+                return null;
+            }
+            this.popNode();
+            if(this.isGoalState()) {
+                return this.moveHistory.slice();;
+            }
+            PegSolitaire.randomizeArray(this.moves);
+            this.expandNode()
+        }
+        return null;
+    }
+
+    initializeSearch() {
         let rootState = this.saveState();
         rootState.moveHistory = [];
-        let stack = [rootState];
-        let explored = new Set([getStateID()]);
+        this.stack = [rootState];
+        this.explored = new Set([this.getStateID()]);
 
         this.numExploredStates = 0;
         this.numRepeatedStates = 0;
         this.searchStartTime = Date.now();
+    }
 
-        while(stack.length > 0) {
+    popNode() {
+        let currState = this.stack.pop();
+        this.restoreState(currState); 
+    }
 
-            if(Date.now() - this.searchStartTime > PegSolitaire.SEARCH_TIME_LIMIT) {
-                //time limit reached
-                console.log("timeout")
-                return null;
+    expandNode() {
+        this.moves.forEach(move => {
+            this.performMove(move, false);
+
+            let hash = this.getStateID();
+            if(this.explored.has(hash)) {
+                this.numRepeatedStates++;
+            } else {
+                this.explored.add(hash);
+                let newState = this.saveState();
+                this.stack.push(newState);
+                this.numExploredStates++;
             }
-
-            //pop node from stack
-            let currState = stack.pop();
-            this.restoreState(currState);
-
-            if(isGoal()) {
-                //successful search
-                console.log("success")
-                let res = this.moveHistory.slice();
-                return res;
-            }
-
-            //expand node: push all (unexplored) successor states onto stack
-            this.moves.forEach(move => {
-                this.performMove(move, false);
-
-                let hash = getStateID();
-                if(explored.has(hash)) {
-                    //state already explored => do not add to stack
-                    this.numRepeatedStates++;
-                } else {
-                    //state is unexplored => add to stack
-                    explored.add(hash);
-                    let newState = this.saveState();
-                    stack.push(newState);
-                    this.numExploredStates++;
-                }
-                this.undo(false);
-            });
-        }
-        
-        //failed search
-        console.log("fail")
-        return null;
+            this.undo(false);
+        });
     }
 
     printSearchStats() {
         console.log("Time: " + (Date.now()-this.searchStartTime)/1000 + " s");
         console.log("n: " + this.numExploredStates);
         console.log("r: " + this.numRepeatedStates);
+    }
+
+    static randomizeArray(arr) {
+        for(let i=0; i<arr.length; i++) {
+            let randomIndex1 = Math.floor(Math.random() * arr.length);
+            let randomIndex2 = Math.floor(Math.random() * arr.length);
+
+            let temp = arr[randomIndex1];
+            arr[randomIndex1] = arr[randomIndex2];
+            arr[randomIndex2] = temp;
+        }
     }
 
     /**
