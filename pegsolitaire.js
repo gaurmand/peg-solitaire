@@ -258,31 +258,19 @@ class PegSolitaire {
         this.restoreState(this.initialState);
     }
 
-    solve(getStateID, isGoalState) {
+    solve(getStateID, isGoalState, randomize = false) {
         let originalState = this.saveState();
         this.getStateID = getStateID;
         this.isGoalState = isGoalState;
 
-        let res = this.DFSSearch();
+        let res = this.DFSSearch(randomize);
 
         this.restoreState(originalState);
         this.printSearchStats();
         return res;
     }
 
-    randomSolve(getStateID, isGoalState) {
-        let originalState = this.saveState();
-        this.getStateID = getStateID;
-        this.isGoalState = isGoalState;
-
-        let res = this.randomizedDFS();
-
-        this.restoreState(originalState);
-        this.printSearchStats();
-        return res;
-    }
-
-    DFSSearch() {
+    DFSSearch(randomize = false) {
         this.initializeSearch();
         while(this.stack.length > 0) {
             if(Date.now() - this.searchStartTime > PegSolitaire.SEARCH_TIME_LIMIT) {
@@ -292,22 +280,10 @@ class PegSolitaire {
             if(this.isGoalState()) {
                 return this.moveHistory.slice();;
             }
-            this.expandNode()
-        }
-        return null;
-    }
 
-    randomizedDFS() {
-        this.initializeSearch();
-        while(this.stack.length > 0) {
-            if(Date.now() - this.searchStartTime > PegSolitaire.SEARCH_TIME_LIMIT) {
-                return null;
+            if(randomize) {
+                PegSolitaire.randomizeArray(this.moves);
             }
-            this.popNode();
-            if(this.isGoalState()) {
-                return this.moveHistory.slice();;
-            }
-            PegSolitaire.randomizeArray(this.moves);
             this.expandNode()
         }
         return null;

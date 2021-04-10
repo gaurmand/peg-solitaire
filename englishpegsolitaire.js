@@ -53,7 +53,6 @@ class EnglishPegSolitaire extends PegSolitaire{
             return null;
         }
     }
-
     
     /**
      * Returns a move sequence that will take the puzzle into a state with one peg remaining at any location
@@ -62,7 +61,7 @@ class EnglishPegSolitaire extends PegSolitaire{
      * @returns {Array|null} - The move sequence (array of move strings)
      */
     altSolve() {
-        let solution = super.randomSolve(()=>this.stateToInt(), ()=>this.isOnePegRemaining());
+        let solution = super.solve(()=>this.stateToInt(), ()=>this.isOnePegRemaining(), true);
         if(solution) {
             return solution.map(move => EnglishPegSolitaire.moveToString(move)).join(", ");
         } else {
@@ -96,13 +95,15 @@ class EnglishPegSolitaire extends PegSolitaire{
 
     classToInt() {
         let h = this.getCongruenceClass();
+
+        //choose minimum as equivalence class representative
         let min = h[0];
         for(let i=1; i<8; i++) {
             if(h[i] < min) {
                 min = h[i];
             }
         }
-        // let res = BigInt("0b"+min);
+        
         return parseInt(min, 2);
     }
 
