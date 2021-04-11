@@ -43,10 +43,17 @@ class PegSolitaire {
         this.minCol = 0;
         this.maxRow = this.board.length - 1;
         this.maxCol = this.board[0].length - 1;
+        this.searchTimeLimit = PegSolitaire.DEFAULT_SEARCH_TIME_LIMIT;
 
         this.moveHistory = [];
         this.initialState = this.saveState();
         this.updateMoves();
+    }
+
+    setSearchTimeLimit(limit) {
+        if(limit > 0) {
+            this.searchTimeLimit = limit;
+        }
     }
 
     getMoves() {
@@ -273,7 +280,7 @@ class PegSolitaire {
     DFSSearch(randomize = false) {
         this.initializeSearch();
         while(this.stack.length > 0) {
-            if(Date.now() - this.searchStartTime > PegSolitaire.SEARCH_TIME_LIMIT) {
+            if(Date.now() - this.searchStartTime > this.searchTimeLimit) {
                 return null;
             }
             this.popNode();
@@ -405,7 +412,7 @@ class PegSolitaire {
     }
 };
 
-PegSolitaire.SEARCH_TIME_LIMIT = 60000;
+PegSolitaire.DEFAULT_SEARCH_TIME_LIMIT = 60000;
 
 module.exports = {
     PegSolitaire
