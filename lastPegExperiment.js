@@ -44,9 +44,9 @@ for (let [key, value] of lastPegPositionCount.entries()) {
 }
 
 console.log("\nPosition key: ");
-game.board[0][3] = "n";
-game.board[3][0] = "b";
-game.board[6][3] = "N";
-game.board[3][6] = "B";
+game.board[0][3] = "b";
+game.board[3][0] = "n";
+game.board[6][3] = "B";
+game.board[3][6] = "N";
 game.board[3][3] = "x";
 game.print();
