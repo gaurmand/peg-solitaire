@@ -267,7 +267,6 @@ class PegSolitaire {
         let res = this.DFSSearch(randomize);
 
         this.restoreState(originalState);
-        this.printSearchStats();
         return res;
     }
 

@@ -47,6 +47,7 @@ function promptMove() {
             printGame();
         } else if(moveStr == "solve" || moveStr == "s") {
             let solution = game.solve();
+            game.printSearchStats();
             if(!solution) {
                 console.log("No solution found");
             } else {

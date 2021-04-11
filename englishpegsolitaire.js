@@ -24,7 +24,7 @@ class EnglishPegSolitaire extends PegSolitaire{
      * Prints the move list
      */
     printMoves() {
-        console.log(EnglishPegSolitaire.moveSequenceToString(this.moves));
+        console.log(EnglishPegSolitaire.moveSequenceToString(this.moves, true));
     }
 
     /**
@@ -308,11 +308,16 @@ class EnglishPegSolitaire extends PegSolitaire{
         }
     }
 
-    static moveSequenceToString(moveseq) {
+    static moveSequenceToString(moveseq, sort=false) {
         if(!Array.isArray(moveseq)) {
             return false;
         }
-        return moveseq.map(move => EnglishPegSolitaire.moveToString(move)).sort().join(", ");
+        let res = moveseq.map(move => EnglishPegSolitaire.moveToString(move))
+        if(sort) {
+            return res.sort().join(", ");
+        } else {
+            return res.join(", ");
+        }
     }
 
     /**
