@@ -15,13 +15,12 @@ if(searchlimit) {
 };
 
 //perform experiment
-console.log("Solutions found: ")
 for(let i=0; i<numTrials; i++) {
     let solution = game.altSolve();
     if(!solution || solutionSet.has(solution)) {
         continue;
     }
-    console.log(solution);
+    // console.log(solution);
     searchTime += Date.now() - game.searchStartTime;
     solutionSet.add(solution);
     lastPegPosition = solution[solution.length-1];
@@ -36,10 +35,18 @@ for(let i=0; i<numTrials; i++) {
 //print stats
 console.log("\nNum of trials: " + numTrials);
 console.log("Num of solutions found: " + solutionSet.size);
+console.log("Search time limit: " + (0.001*searchlimit) + " s");
 let avgSearchTime = solutionSet.size === 0 ? 0 : searchTime/solutionSet.size;
 console.log("Avg search time: " + (0.001*avgSearchTime).toFixed(2) + " s");
 console.log("\nLast peg positions:");
 for (let [key, value] of lastPegPositionCount.entries()) {
-    let pos = EnglishPegSolitaire.stringToPosition(key);
-    console.log(`${key} (${pos[0]},${pos[1]}): ${value}`);
-  }
+    console.log(`${key}: ${value}`);
+}
+
+console.log("\nPosition key: ");
+game.board[0][3] = "n";
+game.board[3][0] = "b";
+game.board[6][3] = "N";
+game.board[3][6] = "B";
+game.board[3][3] = "x";
+game.print();
