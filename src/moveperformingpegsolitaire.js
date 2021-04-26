@@ -1,11 +1,11 @@
-const {MoveComputingPegSolitaire} = require('./movecomputingpegsolitaire');
+const {PegSolitaireBoard} = require('./pegsolitaireboard');
 
-class MovePerformingPegSolitaire extends MoveComputingPegSolitaire {
+class MovePerformingPegSolitaire extends PegSolitaireBoard {
     constructor(str) {
         super(str);
     }
 
-    performMove(move, updateMoves = true) {
+    performMove(move) {
         let hole = move.hole.slice();
         let srcPeg = move.srcPeg.slice();
         let jumpedPeg = MovePerformingPegSolitaire.getJumpedPeg(move);
@@ -13,11 +13,8 @@ class MovePerformingPegSolitaire extends MoveComputingPegSolitaire {
         this.addHole(srcPeg);
         this.addHole(jumpedPeg);
         this.replaceHoleWithPeg(hole);
-
-        if(updateMoves) {
-            this.updateMoves();
-        }
     }
+
     undoMove(move, updateMoves = true) {
         let hole = move.hole.slice();
         let srcPeg = move.srcPeg.slice();
@@ -26,10 +23,6 @@ class MovePerformingPegSolitaire extends MoveComputingPegSolitaire {
         this.replaceHoleWithPeg(srcPeg);
         this.replaceHoleWithPeg(jumpedPeg);
         this.addHole(hole);
-
-        if(updateMoves) {
-            this.updateMoves();
-        }
     }
 
     addHole(holePos) {
@@ -68,45 +61,6 @@ class MovePerformingPegSolitaire extends MoveComputingPegSolitaire {
     }
 };
 
-class PegSolitaire extends MovePerformingPegSolitaire {
-    performMoveSequence(moves) {
-        moves.forEach(move => this.performMove(move, false));
-        this.updateMoves();
-    }
-
-    isValidMoveSequence(moves) {
-        if(!Array.isArray(moves) || moves.length <= 0) {
-            return false;
-        } else if(moves.length <= 1) {
-            return this.isValidMove(moves[0]);
-        } else {
-            let save = this.saveState();
-            for (let i=0; i<moves.length; i++) {
-                if(!this.isValidMove(moves[i])) {
-                    this.restoreState(save);
-                    return false;
-                }
-                this.performMove(moves[i]);
-            }
-            this.restoreState(save);
-            return true;
-        }     
-    }
-        
-    saveState() {
-        return {
-            board: this.board.map(row => row.slice()),
-            holes: this.holes.slice()
-        };
-    }
-
-    restoreState(state) {
-        this.board = state.board;
-        this.holes = state.holes;
-        this.updateMoves();
-    }
-}
-
 module.exports = {
-    PegSolitaire
+    MovePerformingPegSolitaire
 };

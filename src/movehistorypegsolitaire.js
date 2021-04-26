@@ -1,4 +1,4 @@
-const {PegSolitaire} = require('./pegsolitaire');
+const {PegSolitaire} = require('./movecomputingpegsolitaire');
 
 class MoveHistoryPegSolitaire extends PegSolitaire {
 
