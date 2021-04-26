@@ -77,45 +77,6 @@ class MoveComputingPegSolitaire extends MovePerformingPegSolitaire {
     }
 };
 
-class PegSolitaire extends MoveComputingPegSolitaire {
-    performMoveSequence(moves) {
-        moves.forEach(move => this.performMove(move, false));
-        this.updateMoves();
-    }
-
-    isValidMoveSequence(moves) {
-        if(!Array.isArray(moves) || moves.length <= 0) {
-            return false;
-        } else if(moves.length <= 1) {
-            return this.isValidMove(moves[0]);
-        } else {
-            let save = this.saveState();
-            for (let i=0; i<moves.length; i++) {
-                if(!this.isValidMove(moves[i])) {
-                    this.restoreState(save);
-                    return false;
-                }
-                this.performMove(moves[i]);
-            }
-            this.restoreState(save);
-            return true;
-        }     
-    }
-        
-    saveState() {
-        return {
-            board: this.board.map(row => row.slice()),
-            holes: this.holes.slice()
-        };
-    }
-
-    restoreState(state) {
-        this.board = state.board;
-        this.holes = state.holes;
-        this.updateMoves();
-    }
-}
-
 module.exports = {
-    PegSolitaire
+    MoveComputingPegSolitaire
 };

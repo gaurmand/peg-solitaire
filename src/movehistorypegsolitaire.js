@@ -1,6 +1,6 @@
-const {PegSolitaire} = require('./movecomputingpegsolitaire');
+const {MoveSequencePerformingPegSolitaire} = require('./movesequenceperformingpegsolitaire');
 
-class MoveHistoryPegSolitaire extends PegSolitaire {
+class MoveHistoryPegSolitaire extends MoveSequencePerformingPegSolitaire {
 
     constructor(str) {
         super(str);
