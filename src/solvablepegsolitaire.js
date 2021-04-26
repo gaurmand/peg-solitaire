@@ -6,6 +6,12 @@ class SolvablePegSolitaire extends PegSolitaire {
         this.searchTimeLimit = SolvablePegSolitaire.DEFAULT_SEARCH_TIME_LIMIT;
     }
 
+    setSearchTimeLimit(limit) {
+        if(limit > 0) {
+            this.searchTimeLimit = limit;
+        }
+    }
+
     solve(getStateID, isGoalState, randomize = false) {
         let originalState = this.saveState();
         this.getStateID = getStateID;

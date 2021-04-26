@@ -49,12 +49,6 @@ class PegSolitaire {
         this.updateMoves();
     }
 
-    setSearchTimeLimit(limit) {
-        if(limit > 0) {
-            this.searchTimeLimit = limit;
-        }
-    }
-
     getMoves() {
         return this.moves
     }
