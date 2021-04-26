@@ -1,8 +1,7 @@
 const readline = require('readline');
 
-const {EnglishPegSolitaire} = require('./englishpegsolitaire');
-const {EuropeanPegSolitaire} = require('./europeanpegsolitaire');
-
+const {EnglishPegSolitaire} = require('./src/englishpegsolitaire');
+const {EuropeanPegSolitaire} = require('./src/europeanpegsolitaire');
 
 const rl = readline.createInterface({
   input: process.stdin,

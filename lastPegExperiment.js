@@ -1,5 +1,5 @@
-const {EnglishPegSolitaire} = require('./englishpegsolitaire');
-const {PegSolitaire } = require('./pegsolitaire');
+const {EnglishPegSolitaire} = require('./src/englishpegsolitaire');
+const {PegSolitaire } = require('./src/pegsolitaire');
 
 let numTrials = parseInt(process.argv[2]);
 let searchlimit = parseInt(process.argv[3]);

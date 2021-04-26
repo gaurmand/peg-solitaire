@@ -1,6 +1,6 @@
-const {PegSolitaire} = require('./pegsolitaire');
+const {SolvablePegSolitaire} = require('./solvablepegsolitaire');
 
-class EnglishPegSolitaire extends PegSolitaire{
+class EnglishPegSolitaire extends SolvablePegSolitaire{
     constructor(initStr = EnglishPegSolitaire.INTIAL_STATE) {
         super(initStr);
     }
