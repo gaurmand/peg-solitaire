@@ -1,43 +1,15 @@
+const {PegSolitaireBoardInitializer} = require('./pegsolitaireboardinitializer');
+
 class PegSolitaire {
     constructor(str) {
-        if(!PegSolitaire.isValidInitString(str)) {
+        if(!PegSolitaireBoardInitializer.isValidInitString(str)) {
             throw new Error("Invalid initialization string");
         }
 
-        this.board = [[]];
-        this.holes = [];
-        this.numValidPositions = 0;
-
-        let row = 0;
-        let col = 0;
-        let isDigit = char => /^\d+$/.test(char);
-
-        [...str].forEach(char => {
-            if(isDigit(char)) {
-                let num = parseInt(char);
-                for(let i=col; i<col+num; i++) {
-                    this.board[row].push(" ");
-                }
-                col = col+num;
-            } else {
-                switch(char) {
-                    case "o":
-                        this.holes.push([row, col]);
-                    case ".":
-                        this.board[row].push(char);
-                        col++
-                        this.numValidPositions++;
-                        break; 
-                    case "/":
-                        row++;
-                        col = 0;
-                        this.board.push([]);
-                        break;
-                    default:
-                        throw new Error("Invalid initialization string");
-                }
-            }
-        });
+        let res = PegSolitaireBoardInitializer.getBoardFromInitString(str);
+        this.board = res.board;
+        this.holes = res.holes;
+        this.numValidPositions = res.numValidPositions;
 
         this.minRow = 0;
         this.minCol = 0;
@@ -257,47 +229,6 @@ class PegSolitaire {
     reset() {
         this.restoreState(this.initialState);
         this.initialState = this.saveState();
-    }
-
-    /**
-     * Returns true if the initialization string is valid, false otherwise
-     * @param {String} str 
-     * @returns {Boolean}
-     */
-    static isValidInitString(str) {
-        //check if string is valid size
-        if(!str || str.length === 0) {
-            return false;
-        }
-
-        //check if string contains only numbers, ".", "o", and "/" characters
-        if(!/^[\d.o/]+$/.test(str)) {
-            return false;
-        }
-
-        //check if string doesnt start or end with "/"
-        if(str[0] === "/" || str[str.length-1] === "/") {
-            return false;
-        }
-
-        //check if string creates a rectangular board array (Note: the board itself doesn't necessarily have to be rectangular)
-        let isDigit = char => /^\d+$/.test(char);
-        let rowLengths = str.split("/").map(rowStr => {
-            let length = 0;
-            [...rowStr].forEach(char => {
-                if(isDigit(char)) {
-                    length += parseInt(char);
-                } else {
-                    length++;
-                }
-            });
-            return length;
-        });
-        if(!rowLengths.every(length => length === rowLengths[0])) {
-            return false;
-        }
-
-        return true;
     }
 
     static getJumpedPeg(move) {
