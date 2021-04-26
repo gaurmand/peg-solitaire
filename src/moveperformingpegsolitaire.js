@@ -1,11 +1,11 @@
-const {PegSolitaireBoard} = require('./pegsolitaireboard');
+const {MoveComputingPegSolitaire} = require('./movecomputingpegsolitaire');
 
-class MovePerformingPegSolitaire extends PegSolitaireBoard {
+class MovePerformingPegSolitaire extends MoveComputingPegSolitaire {
     constructor(str) {
         super(str);
     }
 
-    performMove(move) {
+    performMove(move, updateMoves = true) {
         let hole = move.hole.slice();
         let srcPeg = move.srcPeg.slice();
         let jumpedPeg = MovePerformingPegSolitaire.getJumpedPeg(move);
@@ -13,6 +13,10 @@ class MovePerformingPegSolitaire extends PegSolitaireBoard {
         this.addHole(srcPeg);
         this.addHole(jumpedPeg);
         this.replaceHoleWithPeg(hole);
+
+        if(updateMoves) {
+            this.updateMoves();
+        }
     }
 
     undoMove(move, updateMoves = true) {
@@ -23,6 +27,10 @@ class MovePerformingPegSolitaire extends PegSolitaireBoard {
         this.replaceHoleWithPeg(srcPeg);
         this.replaceHoleWithPeg(jumpedPeg);
         this.addHole(hole);
+
+        if(updateMoves) {
+            this.updateMoves();
+        }
     }
 
     addHole(holePos) {

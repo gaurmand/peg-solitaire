@@ -1,6 +1,6 @@
-const {MoveComputingPegSolitaire} = require('./movecomputingpegsolitaire');
+const {MovePerformingPegSolitaire} = require('./Moveperformingpegsolitaire');
 
-class SaveablePegSolitaire extends MoveComputingPegSolitaire {
+class SaveablePegSolitaire extends MovePerformingPegSolitaire {
 
     saveState() {
         return {

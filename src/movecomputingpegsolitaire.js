@@ -1,6 +1,6 @@
-const {MovePerformingPegSolitaire} = require('./moveperformingpegsolitaire');
+const {PegSolitaireBoard} = require('./pegsolitaireboard');
 
-class MoveComputingPegSolitaire extends MovePerformingPegSolitaire {
+class MoveComputingPegSolitaire extends PegSolitaireBoard {
     constructor(str) {
         super(str);
         this.updateMoves();
@@ -58,22 +58,6 @@ class MoveComputingPegSolitaire extends MovePerformingPegSolitaire {
 
     printMoves() {
         console.log(this.moves)
-    }
-
-    performMove(move, updateMoves = true) {
-        super.performMove(move);
-
-        if(updateMoves) {
-            this.updateMoves();
-        }
-    }
-
-    undoMove(move, updateMoves = true) {
-        super.undoMove(move);
-
-        if(updateMoves) {
-            this.updateMoves();
-        }
     }
 };
 
