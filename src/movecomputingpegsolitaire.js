@@ -20,6 +20,14 @@ class PegSolitaireBoard {
     getboard() {
         return this.board.map(row => row.slice());
     }
+
+    print() {
+        console.log(this.board.map(row => row.join(" ")).join("\n"))
+    }
+    
+    printHoles() {
+        console.log(this.holes)
+    }
 }
 
 class MoveComputingPegSolitaire extends PegSolitaireBoard {
