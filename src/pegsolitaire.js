@@ -16,8 +16,6 @@ class PegSolitaire {
         this.maxRow = this.board.length - 1;
         this.maxCol = this.board[0].length - 1;
 
-        this.moveHistory = [];
-        this.initialState = this.saveState();
         this.updateMoves();
     }
 
@@ -87,9 +85,6 @@ class PegSolitaire {
         this.holes.splice(res, 1);
         this.board[row][col] = ".";
 
-        //update move history
-        this.moveHistory.push(move);
-
         //compute all moves and store them
         if(updateMoves) {
             this.updateMoves();
@@ -105,15 +100,7 @@ class PegSolitaire {
         this.updateMoves();
     }
 
-    /**
-     * Undos the last move performed and updates the internal state
-     * @param {Boolean} updateMoves - Option to update the moves (defaults to true)
-     */
-    undo(updateMoves = true) {
-        let move = this.moveHistory.pop();
-        if(!move) {
-            return;
-        }
+    undoMove(move, updateMoves = true) {
         let hole = move.hole.slice();
         let srcPeg = move.srcPeg.slice();
         let [row, col] = hole;
@@ -200,35 +187,17 @@ class PegSolitaire {
         console.log(this.moves)
     }
 
-    /**
-     * Returns a state object representing the puzzle's current state
-     * @returns {Object} - The state object
-     */
     saveState() {
         return {
             board: this.board.map(row => row.slice()),
-            holes: this.holes.slice(),
-            moveHistory: this.moveHistory.slice()
+            holes: this.holes.slice()
         };
     }
 
-    /**
-     * Restores the puzzle's state using the input state pbject
-     * @param {*} state - The state object
-     */
     restoreState(state) {
         this.board = state.board;
         this.holes = state.holes;
-        this.moveHistory = state.moveHistory;
         this.updateMoves();
-    }
-
-    /**
-     * Resets the puzzle state to its initial state
-     */
-    reset() {
-        this.restoreState(this.initialState);
-        this.initialState = this.saveState();
     }
 
     static getJumpedPeg(move) {

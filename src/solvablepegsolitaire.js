@@ -1,6 +1,6 @@
-const {PegSolitaire} = require('./pegsolitaire');
+const {MoveHistoryPegSolitaire} = require('./movehistorypegsolitaire');
 
-class SolvablePegSolitaire extends PegSolitaire {
+class SolvablePegSolitaire extends MoveHistoryPegSolitaire {
     constructor(str) {
         super(str);
         this.searchTimeLimit = SolvablePegSolitaire.DEFAULT_SEARCH_TIME_LIMIT;
