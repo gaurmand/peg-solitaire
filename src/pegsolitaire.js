@@ -1,64 +1,8 @@
-const {PegSolitaireBoardInitializer} = require('./pegsolitaireboardinitializer');
+const {MoveComputingPegSolitaire} = require('./movecomputingpegsolitaire');
 
-class PegSolitaire {
+class PegSolitaire extends MoveComputingPegSolitaire {
     constructor(str) {
-        if(!PegSolitaireBoardInitializer.isValidInitString(str)) {
-            throw new Error("Invalid initialization string");
-        }
-
-        let res = PegSolitaireBoardInitializer.getBoardFromInitString(str);
-        this.board = res.board;
-        this.holes = res.holes;
-        this.numValidPositions = res.numValidPositions;
-
-        this.minRow = 0;
-        this.minCol = 0;
-        this.maxRow = this.board.length - 1;
-        this.maxCol = this.board[0].length - 1;
-
-        this.updateMoves();
-    }
-
-    getMoves() {
-        return this.moves
-    }
-
-    /**
-     * Computes all possible moves from the current state and updates the moves property
-     */
-    updateMoves() {
-        let moves = [];
-
-        for(let i=0; i<this.holes.length; i++) {
-            let hole = this.holes[i].slice();
-            let [row, col] = hole;
-
-            //check above peg
-            if(row-2 >= this.minRow && this.board[row-2][col] === "." && this.board[row-1][col] === ".") {
-                moves.push({srcPeg: [row-2,col], hole: hole});
-            }
-            //check below peg
-            if(row+2 <= this.maxRow && this.board[row+2][col] === "." && this.board[row+1][col] === ".") {
-                moves.push({srcPeg: [row+2,col], hole: hole});
-            }
-            //check left peg
-            if(col-2 >= this.minCol && this.board[row][col-2] === "." && this.board[row][col-1] === ".") {
-                moves.push({srcPeg: [row,col-2], hole: hole});
-            }
-            //check right peg
-            if(col+2 <= this.maxCol && this.board[row][col+2] === "." && this.board[row][col+1] === ".") {
-                moves.push({srcPeg: [row,col+2], hole: hole});
-            }
-        }
-        this.moves = moves;
-    }
-
-    /**
-     * Returns true if there are no more moves possible, false otherwise
-     * @returns {Boolean}
-     */
-    isCompleted() {
-        return this.moves.length === 0;
+        super(str);
     }
 
     /**
@@ -127,22 +71,6 @@ class PegSolitaire {
     }
 
     /**
-     * Returns true if a move is valid according to the current board state, false otherwise
-     * @param {Object} move - The move object
-     * @returns {Boolean}
-     */
-    isValidMove(move) {
-        //check if move contains hole and source peg
-        if(!move || !Array.isArray(move.hole) || !Array.isArray(move.srcPeg)) {
-            return false;
-        }
-
-        //check if move is in move set
-        let res = this.moves.findIndex(imove => imove.srcPeg[0] == move.srcPeg[0] && imove.srcPeg[1] == move.srcPeg[1] && imove.hole[0] == move.hole[0] && imove.hole[1] == move.hole[1]);
-        return res >= 0;
-    }
-
-    /**
      *  Returns true if a move sequence is valid according to the current board state, false otherwise
      * @param {Array} moves - The move sequence (array of move objects)
      * @returns {Boolean}
@@ -178,13 +106,6 @@ class PegSolitaire {
      */
     printHoles() {
         console.log(this.holes)
-    }
-
-    /**
-     * Prints the hole list
-     */
-    printMoves() {
-        console.log(this.moves)
     }
 
     saveState() {
