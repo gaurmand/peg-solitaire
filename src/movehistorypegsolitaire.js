@@ -1,11 +1,10 @@
-const {MoveSequencePerformingPegSolitaire} = require('./movesequenceperformingpegsolitaire');
+const {MovePerformingPegSolitaire} = require('./moveperformingpegsolitaire');
 
-class MoveHistoryPegSolitaire extends MoveSequencePerformingPegSolitaire {
+class MoveHistoryPegSolitaire extends MovePerformingPegSolitaire {
 
     constructor(str) {
         super(str);
         this.moveHistory = [];
-        this.initialState = this.saveState();
     }
 
     performMove(move, updateMoves = true) {
@@ -20,11 +19,6 @@ class MoveHistoryPegSolitaire extends MoveSequencePerformingPegSolitaire {
         }
     }
 
-    reset() {
-        this.restoreState(this.initialState);
-        this.initialState = this.saveState();
-    }
-
     pushMoveOntoHistory(move) {
         this.moveHistory.push(move);
     }
@@ -36,18 +30,6 @@ class MoveHistoryPegSolitaire extends MoveSequencePerformingPegSolitaire {
     getHistory() {
         return this.moveHistory.slice();
     }
-
-    saveState() {
-        let state = super.saveState();
-        state.moveHistory = this.moveHistory.slice();
-        return state;
-    }
-
-    restoreState(state) {
-        super.restoreState(state);
-        this.moveHistory = state.moveHistory;
-    }
-
 };
 
 module.exports = {
